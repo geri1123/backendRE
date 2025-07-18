@@ -9,7 +9,7 @@ export class EmailService {
     const mailOptions = {
       from: `Real Estate Platform <${config.email.emailuser}>`,
       to: email,
-      subject: 'Verify Your Email Address',
+      subject: 'Verify Your Account',
       html:verificationEmailTemplate(name , verificationLink), 
     };
 
