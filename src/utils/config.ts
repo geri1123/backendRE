@@ -7,8 +7,8 @@ export const config = {
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 3306,
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'geri1996',
-    name: process.env.DB_NAME || 'realestate_db',
+    password: process.env.DB_PASSWORD ,
+    name: process.env.DB_NAME ,
   },
   server: {
     port: Number(process.env.PORT) || 8080,
@@ -19,7 +19,7 @@ export const config = {
     emailpass: process.env.EMAIL_PASS || '',
   },
   secret: {
-    jwtSecret: process.env.JWT_SECRET || 'your-default-secret',
+    jwtSecret: process.env.JWT_SECRET ,
   },
     client: {
     baseUrl: process.env.CLIENT_BASE_URL || 'http://localhost:3000',
