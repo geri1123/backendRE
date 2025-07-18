@@ -1,0 +1,47 @@
+import { BaseRegistration } from '../../../types/auth.js';
+import { UserRepository } from '../../../repositories/UserRepository.js';
+import { AgencyRepository } from '../../../repositories/AgencyRepository.js';
+import { EmailService } from '../../emailServices/verificationEmailservice.js';
+import { generateToken } from '../../../utils/hash.js';
+
+export class AgencyOwnerRegistration {
+  static async register(body: any): Promise<number> {
+    const {
+      username, email, password,
+      first_name, last_name,
+      agency_name, license_number,
+      address,
+        terms_accepted,
+    } = body;
+
+    const baseData: BaseRegistration = {
+      username,
+      email,
+      password,
+      first_name,
+      last_name,
+        terms_accepted,
+    };
+
+    const verification_token = generateToken();
+    const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const agencyId = await AgencyRepository.create({
+      agency_name,
+      license_number,
+      address
+    });
+
+    const userId = await UserRepository.create({
+      ...baseData,
+      role: 'agency_owner',
+      agency_id: agencyId,
+      status: 'inactive',
+      verification_token,
+      verification_token_expires
+    });
+
+    await EmailService.sendVerificationEmail(email, `${first_name} ${last_name}`, verification_token);
+    return userId;
+  }
+}
