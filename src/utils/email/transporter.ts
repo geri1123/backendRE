@@ -1,6 +1,6 @@
 // File: backend/src/utils/email/transporte.ts
 import nodemailer from 'nodemailer';
-import { config } from '../config.js';
+import { config } from '../../config/config.js';
 
 export const transporter = nodemailer.createTransport({
   service: 'gmail',

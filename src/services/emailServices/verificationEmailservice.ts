@@ -1,5 +1,5 @@
 import { transporter } from '../../utils/email/transporter.js';
-import { config } from '../../utils/config.js';
+import { config } from '../../config/config.js';
 import { verificationEmailTemplate } from '../../utils/email/templates/verificationEmail.js';
 import { welcomeEmailTemplate } from '../../utils/email/templates/welcomeEmail.js';
 export class EmailService {

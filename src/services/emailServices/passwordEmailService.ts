@@ -1,4 +1,4 @@
-import { config } from "../../utils/config";
+import { config } from "../../config/config";
 import { changePasswordTemplate } from "../../utils/email/templates/changePassEmail";
 import { transporter } from "../../utils/email/transporter";
 export const sendPaasemail = async (email: string, name: string) => {

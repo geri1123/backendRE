@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../utils/config.js';
+import { config } from '../config/config.js';
 
 interface DecodedToken {
   userId: number;
@@ -22,7 +22,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
   const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
   if (!token) {
     res.status(401).json({ message: 'No token provided' });
-    return; // important: return after sending response
+    return; 
   }
 
   try {
@@ -32,6 +32,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token' });
-    return; // return here as well
+    return; 
   }
 };

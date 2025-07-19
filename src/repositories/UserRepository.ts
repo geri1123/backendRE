@@ -57,21 +57,28 @@ export class UserRepository {
   
   static async findByVerificationToken(token: string): Promise<User | null> {
     const [rows] = await pool.execute(
-      'SELECT * FROM users WHERE verification_token = ? AND verification_token_expires > NOW()',
+      'SELECT id, role, email, first_name, agency_id  FROM users WHERE verification_token = ? AND verification_token_expires > NOW()',
       [token]
     );
     return (rows as User[])[0] || null;
   }
   
-  static async verifyEmail(userId: number): Promise<void> {
-    await pool.execute(
-      `UPDATE users 
-       SET email_verified = true, verification_token = NULL,
-           verification_token_expires = NULL, status = 'active'
-       WHERE id = ?`,
-      [userId]
-    );
-  }
+  static async verifyEmail(userId: number, emailVerified: number, statusToUpdate: string): Promise<void> {
+  await pool.execute(
+    `UPDATE users 
+     SET email_verified = ?, status = ?, 
+         verification_token = NULL, verification_token_expires = NULL 
+     WHERE id = ?`,
+    [emailVerified, statusToUpdate, userId] 
+  );
+}
+static async regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<string> {
+  await pool.execute(
+    'UPDATE users SET verification_token = ?, verification_token_expires = ? WHERE id = ?',
+    [token, expires, userId]
+  );
+  return token;
+}
   
   static async findById(id: number): Promise<User | null> {
     const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [id]);

@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise';
-import {config} from '../utils/config.js';
+import {config} from './config.js';
 
 // Create connection pool with correct options
 const pool = mysql.createPool({

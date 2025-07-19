@@ -21,6 +21,12 @@ export class AgencyRepository {
     const [rows]=await pool.execute('SELECT 1 FROM agencies WHERE agency_name=?' , [agency_name]);
     return (rows as any[]).length>0;
   }
+  static async activateAgency(agencyId: number): Promise<void> {
+  await pool.execute(
+    `UPDATE agencies SET status = 'active' WHERE id = ?`,
+    [agencyId]
+  );
+}
   static async create(agencyData: {
     agency_name: string;
     license_number: string;

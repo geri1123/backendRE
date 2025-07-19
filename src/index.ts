@@ -1,10 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response,ErrorRequestHandler  } from "express";
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from "path";
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
-import { config } from "./utils/config.js";
+import { config } from "./config/config.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 
 import updateProfile from './routes/userRoutes.js'
@@ -75,6 +76,7 @@ app.listen(config.server.port, () => {
     console.log(`🚀 Server running on port ${config.server.port}`);
     console.log(`📡 Health check: http://localhost:${config.server.port}/health`);
 });
+app.use(errorHandler as ErrorRequestHandler);
 // import { detectLanguage } from "./middlewares/languagemiddleware.js";
 // app.use(detectLanguage);
 // app.get("/example", (req, res) => {

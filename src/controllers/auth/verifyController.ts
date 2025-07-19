@@ -1,76 +1,77 @@
-import { Request, Response } from 'express';
-import pool from '../../config/db.js';
+// src/controllers/authController.ts
+import { Request, Response, NextFunction } from 'express';
 import { EmailService } from '../../services/emailServices/verificationEmailservice.js';
-
-export async function verifyEmail(req: Request, res: Response): Promise<void> {
+import { UserRepository } from '../../repositories/UserRepository.js';
+import { AgencyRepository } from '../../repositories/AgencyRepository.js';
+import { ValidationError, NotFoundError } from '../../errors/BaseError.js';
+import { generateToken } from '../../utils/hash.js';
+export async function verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const token = req.query.token;
 
-    // Validate token
     if (typeof token !== 'string') {
-       res.status(400).json({
-        success: false,
-        message: 'Verification token is required',
-      });
-      return
+      throw new ValidationError({ token: 'Verification token is required.' });
     }
 
-    // Check if token is valid and not expired
-    const [rows] = await pool.query(
-      `SELECT id, role, email, first_name, agency_id 
-       FROM users 
-       WHERE verification_token = ? 
-         AND verification_token_expires > NOW()`,
-      [token]
-    );
+    const user = await UserRepository.findByVerificationToken(token);
 
-    const user = (rows as any[])[0];
     if (!user) {
-       res.status(400).json({
-        success: false,
-        message: 'Invalid or expired verification token',
-      });
-      return
+      throw new NotFoundError('Invalid or expired verification token.');
     }
 
-    // Determine status to update
     const emailVerified = 1;
     const statusToUpdate = user.role === 'agent' ? 'pending' : 'active';
 
-    // Update user email_verified and status
-    await pool.query(
-      `UPDATE users 
-       SET email_verified = ?, status = ?, 
-           verification_token = NULL, verification_token_expires = NULL 
-       WHERE id = ?`,
-      [emailVerified, statusToUpdate, user.id]
-    );
+    await UserRepository.verifyEmail(user.id, emailVerified, statusToUpdate);
 
-    // If user is agency owner, activate agency
     if (user.role === 'agency_owner' && user.agency_id) {
-      await pool.query(
-        `UPDATE agencies SET status = 'active' WHERE id = ?`,
-        [user.agency_id]
-      );
+      await AgencyRepository.activateAgency(user.agency_id);
     }
 
-    // Send email based on role
     if (user.role === 'agent') {
       await EmailService.sendPendingApprovalEmail(user.email, user.first_name);
     } else {
       await EmailService.sendWelcomeEmail(user.email, user.first_name);
     }
 
-    // Final response
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully',
+      message: 'Email verified successfully.',
     });
   } catch (error) {
-    console.error('Email verification error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error',
+    next(error); 
+  }
+}
+export async function resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new ValidationError({ email: 'Email is required.' });
+    }
+
+    const user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundError('User not found.');
+    }
+
+    if (user.email_verified) {
+      throw new ValidationError({ email: 'Email is already verified.' });
+    }
+  const token = generateToken();
+
+    // Set token expiration time, e.g. 24 hours from now
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const newToken = await UserRepository.regenerateVerificationToken(user.id, token, expires);
+
+    await EmailService.sendVerificationEmail(user.email, newToken, user.first_name);
+
+    res.status(200).json({
+      success: true,
+      message: 'Verification email resent.',
     });
+  } catch (error) {
+    next(error);
   }
 }
