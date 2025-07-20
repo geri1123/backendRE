@@ -113,6 +113,12 @@ static async updatePassword(userId: number, hashedPassword: string): Promise<voi
   await pool.execute("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?", [hashedPassword, userId]);
 }
 static async updateProfileImg(userId: number, profileImg: string): Promise<void> {
-  await pool.execute("UPDATE `users` SET profile_img = ? WHERE id = ?", [profileImg, userId]);
+  await pool.execute("UPDATE `users` SET profile_img = ?,updated_at = NOW()  WHERE id = ?", [profileImg, userId]);
+}
+static async updateAboutMe(userId: number, aboutMe: string): Promise<void> {
+  await pool.execute("UPDATE `users` SET about_me = ?,updated_at = NOW()  WHERE id = ?", [aboutMe, userId]);
+}
+static async updatePhone(userId: number, phone: string): Promise<void> {
+  await pool.execute("UPDATE `users` SET phone = ?,updated_at = NOW()  WHERE id = ?", [phone, userId]);
 }
 }
