@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { register } from '../controllers/auth/AuthController';
-import { loginUser } from '../controllers/auth/AuthController';
-import { resendVerificationEmail } from '../controllers/auth/verifyController';
-import { loginRateLimiter } from '../middlewares/ratelimit';
-import  {verifyEmail}  from '../controllers/auth/verifyController';
+import { register } from '../controllers/auth/AuthController.js';
+import { loginUser } from '../controllers/auth/AuthController.js';
+import { resendVerificationEmail } from '../controllers/auth/verifyController.js';
+import { loginRateLimiter } from '../middlewares/ratelimit.js';
+import  {verifyEmail}  from '../controllers/auth/verifyController.js';
+
 const router = Router();
 
 router.post('/register', register); 

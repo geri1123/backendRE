@@ -71,7 +71,7 @@ export async function resendVerificationEmail(req: Request, res: Response, next:
       success: true,
       message: 'Verification email resent.',
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err); ;
   }
 }

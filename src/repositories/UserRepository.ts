@@ -79,14 +79,40 @@ static async regenerateVerificationToken(userId: number, token: string, expires:
   );
   return token;
 }
-  
-  static async findById(id: number): Promise<User | null> {
-    const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [id]);
-    return (rows as User[])[0] || null;
-  }
+ static async findById(id: number): Promise<User | null> {
+  const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [id]);
+  const users = rows as User[];
+  if (users.length === 0) return null;
+  return users[0];
+} 
+
   
   static async findByEmail(email: string): Promise<User | null> {
     const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     return (rows as User[])[0] || null;
   }
+ static async getUsernameById(userId: number): Promise<string | null> {
+    const [rows] = await pool.execute('SELECT username FROM users WHERE id = ?', [userId]);
+    return (rows as any[])[0]?.username || null;
+  }
+
+  static async updateUsername(userId: number, newUsername: string): Promise<void> {
+    await pool.execute(
+      'UPDATE users SET username = ?, updated_at = NOW() WHERE id = ?',
+      [newUsername, userId]
+    );
+  }
+  static async getUserPasswordById( userId: number): Promise<string | null> {
+  const [rows] = await pool.execute("SELECT password FROM users WHERE id = ?", [userId]);
+  if ((rows as any[]).length === 0) {
+    return null;
+  }
+  return (rows as any)[0].password;
+}
+static async updatePassword(userId: number, hashedPassword: string): Promise<void> {
+  await pool.execute("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?", [hashedPassword, userId]);
+}
+static async updateProfileImg(userId: number, profileImg: string): Promise<void> {
+  await pool.execute("UPDATE `users` SET profile_img = ? WHERE id = ?", [profileImg, userId]);
+}
 }

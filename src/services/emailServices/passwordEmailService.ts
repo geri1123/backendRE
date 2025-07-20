@@ -1,7 +1,7 @@
 import { config } from "../../config/config";
 import { changePasswordTemplate } from "../../utils/email/templates/changePassEmail";
 import { transporter } from "../../utils/email/transporter";
-export const sendPaasemail = async (email: string, name: string) => {
+export const sendPassemail = async (email: string, name: string) => {
   const mailOptions = {
     from: `Real Estate Platform <${config.email.emailuser}>`,
     to: email,

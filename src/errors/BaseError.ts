@@ -28,3 +28,9 @@ export class NotFoundError extends BaseError {
     super(message, 404);
   }
 }
+
+ export class FileSystemError extends BaseError {
+  constructor(message: string) {
+    super(message, 500);
+  }
+}
