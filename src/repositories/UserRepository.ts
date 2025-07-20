@@ -1,6 +1,6 @@
-import pool from '../config/db';
-import { User, BaseRegistration } from '../types/auth';
-import { hashPassword } from '../utils/hash';
+import pool from '../config/db.js';
+import { User, BaseRegistration } from '../types/auth.js';
+import { hashPassword } from '../utils/hash.js';
 
 export class UserRepository {
   //login

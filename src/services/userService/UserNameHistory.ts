@@ -1,7 +1,7 @@
-import { UserRepository } from "../../repositories/UserRepository";
-import { UsernameHistoryRepository } from "../../repositories/UsernameHistoryRepository";
+import { UserRepository } from "../../repositories/UserRepository.js";
+import { UsernameHistoryRepository } from "../../repositories/UsernameHistoryRepository.js";
 
-import { ValidationError , NotFoundError} from "../../errors/BaseError";
+import { ValidationError , NotFoundError} from "../../errors/BaseError.js";
 export class UsernameService {
   
 

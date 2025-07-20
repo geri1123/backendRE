@@ -1,10 +1,10 @@
 
-import { UserRepository } from "../repositories/UserRepository";
-import { AgencyRepository } from "../repositories/AgencyRepository";
-import { RegistrationRequestRepository } from "../repositories/RegistrationRequestRepository";
-import { RegistrationData } from "../types/auth";
-import { validateRegistrationInput } from "./authValidator";
-import { ValidationError } from "../errors/BaseError";
+import { UserRepository } from "../repositories/UserRepository.js";
+import { AgencyRepository } from "../repositories/AgencyRepository.js";
+import { RegistrationRequestRepository } from "../repositories/RegistrationRequestRepository.js";
+import { RegistrationData } from "../types/auth.js";
+import { validateRegistrationInput } from "./authValidator.js";
+import { ValidationError } from "../errors/BaseError.js";
 
 export async function validateRegistrationInputAsync(data: RegistrationData): Promise<void> {
   const errors = validateRegistrationInput(data);

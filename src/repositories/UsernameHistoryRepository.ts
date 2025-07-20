@@ -1,5 +1,5 @@
-import pool from "../config/db";
-import { UsernameHistoryRecord } from "../types/user";
+import pool from "../config/db.js";
+import { UsernameHistoryRecord } from "../types/user.js";
 
 export class UsernameHistoryRepository {
   static async getLastUsernameChange(userId: number): Promise<UsernameHistoryRecord | null> {

@@ -1,9 +1,9 @@
 import { Request, Response , NextFunction } from 'express';
-import { AuthService } from '../../services/AuthServices/AuthService';
-import { validateRegistrationInputAsync } from '../../validators/authValidatorAsync';
+import { AuthService } from '../../services/AuthServices/AuthService.js';
+import { validateRegistrationInputAsync } from '../../validators/authValidatorAsync.js';
 import { LoginRequest } from "../../types/auth.js"; 
 
-import { ValidationError } from '../../errors/BaseError';
+import { ValidationError } from '../../errors/BaseError.js';
 
 export async function register(
   req: Request,

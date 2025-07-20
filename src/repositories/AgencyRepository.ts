@@ -1,6 +1,6 @@
-import pool from '../config/db';
-import { Agency } from '../types/auth';
-import { generatePublicCode } from '../utils/hash';
+import pool from '../config/db.js';
+import { Agency } from '../types/auth.js';
+import { generatePublicCode } from '../utils/hash.js';
 
 export class AgencyRepository {
   static async licenseExists(license: string): Promise<boolean> {

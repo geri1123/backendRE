@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { validateUsernameInput } from "../../validators/changeUsernameValidation";
-import { UsernameService } from "../../services/userService/UserNameHistory";
-import { ValidationError } from "../../errors/BaseError";
-import { UnauthorizedError } from "../../errors/BaseError";
+import { validateUsernameInput } from "../../validators/changeUsernameValidation.js";
+import { UsernameService } from "../../services/userService/UserNameHistory.js";
+import { ValidationError } from "../../errors/BaseError.js";
+import { UnauthorizedError } from "../../errors/BaseError.js";
 interface ChangeUsernameBody {
   username: string;
 }

@@ -1,4 +1,4 @@
-import { RegistrationData } from "../types/auth";
+import { RegistrationData } from "../types/auth.js";
 
 export function validateRegistrationInput(data: RegistrationData) {
   const errors: Record<string, string> = {};

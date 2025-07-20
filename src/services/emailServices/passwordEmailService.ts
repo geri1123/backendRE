@@ -1,6 +1,6 @@
-import { config } from "../../config/config";
-import { changePasswordTemplate } from "../../utils/email/templates/changePassEmail";
-import { transporter } from "../../utils/email/transporter";
+import { config } from "../../config/config.js";
+import { changePasswordTemplate } from "../../utils/email/templates/changePassEmail.js";
+import { transporter } from "../../utils/email/transporter.js";
 export const sendPassemail = async (email: string, name: string) => {
   const mailOptions = {
     from: `Real Estate Platform <${config.email.emailuser}>`,
