@@ -7,4 +7,7 @@ export class ProfileInfoService{
     async updateUserPhone(userId:number , phone:string ):Promise<void>{
         await UserRepository.updatePhone(userId , phone);
     }
+    async updateFirstNlastN (userId:number , firstName:string , lastName:string):Promise<void>{
+        await UserRepository.updateFnmLnm(userId ,firstName  , lastName);
+    }
 }

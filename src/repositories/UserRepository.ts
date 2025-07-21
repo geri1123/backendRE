@@ -121,4 +121,7 @@ static async updateAboutMe(userId: number, aboutMe: string): Promise<void> {
 static async updatePhone(userId: number, phone: string): Promise<void> {
   await pool.execute("UPDATE `users` SET phone = ?,updated_at = NOW()  WHERE id = ?", [phone, userId]);
 }
+static async updateFnmLnm(userId:number , firstName:string ,lastName:string  ):Promise<void>{
+   await pool.execute("UPDATE `users` SET first_name = ? , last_name=?,updated_at = NOW()  WHERE id = ?", [firstName , lastName, userId]);
+}
 }
