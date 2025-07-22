@@ -1,6 +1,6 @@
 import { BaseRegistration } from '../../../types/auth.js';
-import { UserRepository } from '../../../repositories/UserRepository.js';
-import { AgencyRepository } from '../../../repositories/AgencyRepository.js';
+import { UserInserts } from '../../../repositories/user/index.js';
+import { AgencyInserts    } from '../../../repositories/agency/index.js';
 import { EmailService } from '../../emailServices/verificationEmailservice.js';
 import { generateToken } from '../../../utils/hash.js';
 
@@ -26,13 +26,13 @@ export class AgencyOwnerRegistration {
     const verification_token = generateToken();
     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const agencyId = await AgencyRepository.create({
+    const agencyId = await AgencyInserts.create({
       agency_name,
       license_number,
       address
     });
 
-    const userId = await UserRepository.create({
+    const userId = await UserInserts.create({
       ...baseData,
       role: 'agency_owner',
       agency_id: agencyId,

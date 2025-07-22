@@ -5,3 +5,11 @@ export interface UsernameHistoryRecord {
   new_username: string;
   next_username_update: Date;
 }
+
+export type UserForLogin = {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  status: 'active' | 'inactive' | 'pending' | 'suspended';
+};

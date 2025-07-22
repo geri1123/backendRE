@@ -16,13 +16,21 @@ export class ValidationError extends BaseError {
     super("Validation failed", 400, errors);
   }
 }
-
 export class UnauthorizedError extends BaseError {
-  constructor(message = "Unauthorized") {
-    super(message, 401);
+  constructor(message = "Unauthorized", errors?: Record<string, string>) {
+    super(message, 401, errors);
   }
 }
-
+// export class UnauthorizedError extends BaseError {
+//   constructor(message = "Unauthorized") {
+//     super(message, 401);
+//   }
+// }
+export class ForbiddenError extends BaseError {
+  constructor(message = "Forbidden") {
+    super(message, 403);
+  }
+}
 export class NotFoundError extends BaseError {
   constructor(message = "Not found") {
     super(message, 404);

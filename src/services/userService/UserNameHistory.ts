@@ -1,5 +1,5 @@
-import { UserRepository } from "../../repositories/UserRepository.js";
-import { UsernameHistoryRepository } from "../../repositories/UsernameHistoryRepository.js";
+import { UserQueries  , UserUpdates} from "../../repositories/user/index.js";
+import { UsernameHistoryRepository } from "../../repositories/usernameHistory/UsernameHistoryRepository.js";
 
 import { ValidationError , NotFoundError} from "../../errors/BaseError.js";
 export class UsernameService {
@@ -12,12 +12,12 @@ export class UsernameService {
   }
 
   async changeUsername(userId: number, newUsername: string): Promise<void> {
-   const usernameTaken = await UserRepository.usernameExists(newUsername);
+   const usernameTaken = await UserQueries.usernameExists(newUsername);
     if (usernameTaken) {
       throw new ValidationError({ username: "Username already taken" });
     }
    
- const currentUsername = await UserRepository.getUsernameById(userId);
+ const currentUsername = await UserQueries.getUsernameById(userId);
     if (!currentUsername) {
       throw new NotFoundError("User not found");
     }
@@ -25,7 +25,7 @@ export class UsernameService {
     const nextUpdate = new Date();
     nextUpdate.setDate(nextUpdate.getDate() + 10);
 
-    await UserRepository.updateUsername(userId, newUsername);
+    await UserUpdates.updateUsername(userId, newUsername);
     await UsernameHistoryRepository.saveUsernameChange(userId, currentUsername, newUsername, nextUpdate); 
   }
 }

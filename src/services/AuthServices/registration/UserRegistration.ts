@@ -1,5 +1,5 @@
 import { BaseRegistration } from '../../../types/auth.js';
-import { UserRepository } from '../../../repositories/UserRepository.js';
+import { UserInserts } from '../../../repositories/user/index.js';
 import { EmailService } from '../../emailServices/verificationEmailservice.js';
 import { generateToken } from '../../../utils/hash.js';
 import { UserRegistration as UserRegistrationType  } from '../../../types/auth.js';
@@ -23,7 +23,7 @@ export class UserRegistration {
     const verification_token = generateToken();
     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const userId = await UserRepository.create({
+    const userId = await UserInserts.create({
       ...baseData,
       role: 'user',
       status: "inactive",

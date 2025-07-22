@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { config } from "./config/config.js";
 import errorHandler from "./middlewares/errorHandler.js";
-
+import agencyRouter from './routes/agencyRouter.js';
 
 import updateProfile from './routes/userRoutes.js'
 
@@ -53,7 +53,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRouter);
 
 app.use('/profile' , updateProfile)
-
+app.use('/agencyapi' , agencyRouter)
 // Health check endpoint
 app.get('/', (req: Request, res: Response) => {
     res.json({ 

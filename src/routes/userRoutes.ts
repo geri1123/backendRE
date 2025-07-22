@@ -8,11 +8,11 @@ import { changePassword } from '../controllers/user/updatePassword.js';
 import { updatePhone } from '../controllers/user/updatePhone.js';
 import { updateFnameLname } from '../controllers/user/updateFnameLname.js';
 const router = express.Router();
-
-router.patch('/update-profileImg', verifyToken, uploadSingleImage, updateProfileImage);
-router.patch('/update-username' , verifyToken , changeUsername); 
-router.patch('/update-password' , verifyToken , changePassword);
-router.patch('/update-aboutMe' , verifyToken ,updateAboutMe );
-router.patch('/update-phone' , verifyToken ,updatePhone );
-router.patch('/update-FnmLnm' , verifyToken ,updateFnameLname )
+router.use(verifyToken);
+router.patch('/update-profileImg',  uploadSingleImage, updateProfileImage);
+router.patch('/update-username' ,  changeUsername); 
+router.patch('/update-password' ,  changePassword);
+router.patch('/update-aboutMe' ,  updateAboutMe );
+router.patch('/update-phone' ,updatePhone );
+router.patch('/update-FnmLnm' ,updateFnameLname )
 export default router;

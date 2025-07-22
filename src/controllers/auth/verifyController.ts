@@ -1,8 +1,8 @@
 // src/controllers/authController.ts
 import { Request, Response, NextFunction } from 'express';
 import { EmailService } from '../../services/emailServices/verificationEmailservice.js';
-import { UserRepository } from '../../repositories/UserRepository.js';
-import { AgencyRepository } from '../../repositories/AgencyRepository.js';
+import { UserQueries, UserUpdates} from '../../repositories/user/index.js';
+import { AgencyUpdates } from '../../repositories/agency/index.js';
 import { ValidationError, NotFoundError } from '../../errors/BaseError.js';
 import { generateToken } from '../../utils/hash.js';
 export async function verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -13,7 +13,7 @@ export async function verifyEmail(req: Request, res: Response, next: NextFunctio
       throw new ValidationError({ token: 'Verification token is required.' });
     }
 
-    const user = await UserRepository.findByVerificationToken(token);
+    const user = await UserQueries.findByVerificationToken(token);
 
     if (!user) {
       throw new NotFoundError('Invalid or expired verification token.');
@@ -22,16 +22,16 @@ export async function verifyEmail(req: Request, res: Response, next: NextFunctio
     const emailVerified = 1;
     const statusToUpdate = user.role === 'agent' ? 'pending' : 'active';
 
-    await UserRepository.verifyEmail(user.id, emailVerified, statusToUpdate);
+    await UserUpdates.verifyEmail(user.id, emailVerified, statusToUpdate);
 
     if (user.role === 'agency_owner' && user.agency_id) {
-      await AgencyRepository.activateAgency(user.agency_id);
+      await AgencyUpdates.activateAgency(user.agency_id);
     }
-
+ const safeFirstName = user.first_name ?? 'User';
     if (user.role === 'agent') {
-      await EmailService.sendPendingApprovalEmail(user.email, user.first_name);
+      await EmailService.sendPendingApprovalEmail(user.email, safeFirstName);
     } else {
-      await EmailService.sendWelcomeEmail(user.email, user.first_name);
+      await EmailService.sendWelcomeEmail(user.email,safeFirstName);
     }
 
     res.status(200).json({
@@ -50,7 +50,7 @@ export async function resendVerificationEmail(req: Request, res: Response, next:
       throw new ValidationError({ email: 'Email is required.' });
     }
 
-    const user = await UserRepository.findByEmail(email);
+    const user = await UserQueries.findByEmail(email);
 
     if (!user) {
       throw new NotFoundError('User not found.');
@@ -59,19 +59,24 @@ export async function resendVerificationEmail(req: Request, res: Response, next:
     if (user.email_verified) {
       throw new ValidationError({ email: 'Email is already verified.' });
     }
-  const token = generateToken();
 
-    // Set token expiration time, e.g. 24 hours from now
+    // Generate a new token and expiry
+    const token = generateToken();
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-  const newToken = await UserRepository.regenerateVerificationToken(user.id, token, expires);
 
-    await EmailService.sendVerificationEmail(user.email, newToken, user.first_name);
+   
+    await UserUpdates.regenerateVerificationToken(user.id, token, expires);
+const name = user.first_name ?? 'User';  
+    // Send email with the token
+    await EmailService.sendVerificationEmail(user.email, token, name);
 
+    
     res.status(200).json({
       success: true,
       message: 'Verification email resent.',
+      token, 
     });
   } catch (err) {
-    next(err); ;
+    next(err);
   }
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError, ValidationError } from "../../errors/BaseError";
-
+import { UserUpdates } from "../../repositories/user/index.js";
 interface UpdateFnameLname {
   firstName: string;
   lastName: string;
@@ -11,7 +11,7 @@ export async function updateFnameLname(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const userId = req.userId; // ensure userId is being set via middleware
+  const userId = req.userId; 
 
   if (!userId) throw new UnauthorizedError("User not authenticated");
 
@@ -26,7 +26,7 @@ if (!lastName || lastName.trim() === "") {
 }
 
   try {
-    // await someService.updateNames(userId, firstName, lastName);
+       UserUpdates.updateFnmLnm(userId, firstName, lastName);
     res.status(200).json({ message: "Name updated successfully" });
   } catch (err) {
     next(err);

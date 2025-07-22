@@ -1,13 +1,13 @@
-import { UserRepository } from "../../repositories/UserRepository";
+import { UserQueries  , UserUpdates} from "../../repositories/user/index.js";
 
 export class ProfileInfoService{
     async updateAboutMe(userId:number  , aboutMe:string):Promise<void>{
-        await UserRepository.updateAboutMe(userId , aboutMe);
+        await UserUpdates.updateAboutMe(userId , aboutMe);
     }
     async updateUserPhone(userId:number , phone:string ):Promise<void>{
-        await UserRepository.updatePhone(userId , phone);
+        await UserUpdates.updatePhone(userId , phone);
     }
     async updateFirstNlastN (userId:number , firstName:string , lastName:string):Promise<void>{
-        await UserRepository.updateFnmLnm(userId ,firstName  , lastName);
+        await UserUpdates.updateFnmLnm(userId ,firstName  , lastName);
     }
 }

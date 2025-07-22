@@ -19,10 +19,14 @@ declare global {
 }
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
-  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  const token =
+    req.cookies?.token ||
+    (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
+
   if (!token) {
-    res.status(401).json({ message: 'No token provided' });
-    return; 
+     res.status(401).json({ error: 'unauthorized', message: 'No token provided' });
+  return;
   }
 
   try {
@@ -31,7 +35,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid or expired token' });
-    return; 
-  }
+     res.status(401).json({ error: 'unauthorized', message: 'Invalid or expired token' });
+    return;
+    }
 };

@@ -1,10 +1,10 @@
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import { UserRepository } from "../../repositories/UserRepository.js";
+import { UserQueries  , UserUpdates} from "../../repositories/user/index.js";
 import { NotFoundError, UnauthorizedError, ValidationError } from "../../errors/BaseError.js";
 
 export class PasswordService {
   async getStoredPassword(userId: number): Promise<string> {
-    const storedPassword = await UserRepository.getUserPasswordById(userId);
+    const storedPassword = await UserQueries.getUserPasswordById(userId);
     if (!storedPassword) {
       throw new NotFoundError("User not found.");
     }
@@ -25,16 +25,18 @@ export class PasswordService {
 
   
   async updatePassword(userId: number, hashedPassword: string): Promise<void> {
-    await UserRepository.updatePassword(userId, hashedPassword);
+    await UserUpdates.updatePassword(userId, hashedPassword);
   }
 
-  // Main method to change password using all above steps
+  
   async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
     const storedPassword = await this.getStoredPassword(userId);
 
     const validCurrent = await this.isCurrentPasswordValid(currentPassword, storedPassword);
     if (!validCurrent) {
-      throw new UnauthorizedError("Current password is incorrect.");
+     if (!validCurrent) {
+  throw new ValidationError({ password: "Current password is incorrect." });
+}
     }
 
     const samePassword = await this.isNewPasswordSameAsCurrent(newPassword, storedPassword);

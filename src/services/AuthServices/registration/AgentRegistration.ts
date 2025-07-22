@@ -1,7 +1,7 @@
 import { BaseRegistration } from '../../../types/auth.js';
-import { UserRepository } from '../../../repositories/UserRepository.js';
-import { AgencyRepository } from '../../../repositories/AgencyRepository.js';
-import { RegistrationRequestRepository } from '../../../repositories/RegistrationRequestRepository.js';
+import { UserInserts } from '../../../repositories/user/index.js';
+import {  AgencyQueries } from '../../../repositories/agency/index.js';
+import { RegistrationRequestRepository } from '../../../repositories/registrationRequest/RegistrationRequest.js';
 import { EmailService } from '../../emailServices/verificationEmailservice.js';
 import { generateToken } from '../../../utils/hash.js';
 import { AgentRegistration as AgentRegistrationType } from '../../../types/auth.js';
@@ -25,10 +25,10 @@ export class AgentRegistration {
     const verification_token = generateToken();
     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const agency = await AgencyRepository.findByPublicCode(public_code);
+    const agency = await AgencyQueries.findByPublicCode(public_code);
     if (!agency) throw new Error('Invalid agency code.');
 
-    const userId = await UserRepository.create({
+    const userId = await UserInserts.create({
       ...baseData,
       role: 'agent',
       agency_id: agency.id,

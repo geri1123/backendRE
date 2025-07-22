@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { PasswordService } from "../../services/userService/passwordService.js";
 import { ValidationError, UnauthorizedError } from "../../errors/BaseError.js";
 import { validateChangePassword } from "../../validators/changePassValidation.js";
-import { UserRepository } from "../../repositories/UserRepository.js";
+import { UserQueries } from "../../repositories/user/index.js";
 import { sendPassemail } from "../../services/emailServices/passwordEmailService.js";
 
 type ChangePasswordBody = {
@@ -32,7 +32,7 @@ export async function changePassword(
     }
 
     await passwordService.changePassword(userId, currentPassword, newPassword);
-    const user = await UserRepository.findById(userId);
+    const user = await UserQueries.findById(userId);
     if (user && user.email && user.username) {
      
       sendPassemail(user.email, user.username).catch((err) => {

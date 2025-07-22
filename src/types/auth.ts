@@ -1,3 +1,5 @@
+
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended';
 export interface User {
   id: number;
   username: string;
@@ -11,7 +13,7 @@ export interface User {
   website?: string;
   role: 'user' | 'agency_owner' | 'agent';
   agency_id?: number;
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  status: UserStatus;
   email_verified: boolean;
   last_login?: Date;
   last_active?: Date;

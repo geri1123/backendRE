@@ -7,7 +7,7 @@ import { UnauthorizedError } from '../../errors/BaseError.js';
 import jwt from 'jsonwebtoken';
 import { comparePassword } from '../../utils/hash.js';
 import { config } from '../../config/config.js';
-import { UserRepository } from '../../repositories/UserRepository.js';
+import { UserQueries } from '../../repositories/user/index.js';
 
 
 
@@ -29,7 +29,7 @@ export class AuthService {
 
 
 async login(identifier: string, password: string) {
-  const user = await UserRepository.findByIdentifier(identifier);
+  const user = await UserQueries.findByIdentifier(identifier);
 
   if (!user) {
     throw new UnauthorizedError('Invalid credentials');
@@ -45,7 +45,7 @@ async login(identifier: string, password: string) {
   }
 
   const token = jwt.sign(
-    { userId: user.id, username: user.username, email: user.email },
+    { userId: user.id, username: user.username, email: user.email , role:user.role },
     config.secret.jwtSecret as string,
     { expiresIn: '1d' }
   );
