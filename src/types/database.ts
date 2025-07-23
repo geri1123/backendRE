@@ -18,7 +18,7 @@ export type UsernameHistoryRecord = InferSelectModel<typeof username_history>;
 export type NewUsernameHistoryRecord = InferInsertModel<typeof username_history>;
 
 // Partial views
-export type PartialUserForLogin = Pick<User, 'id' | 'username' | 'email' | 'password' | 'status'| 'role'>;
+export type PartialUserForLogin = Pick<User, 'id' | 'username' | 'email' | 'password' | 'status'| 'role' | 'agency_id'>;
 export type PartialUserByToken = Pick<User, 'id' | 'role' | 'email' | 'first_name' | 'agency_id'>;
 
 // Frontend-friendly types (convert tinyint to boolean)

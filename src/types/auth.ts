@@ -75,11 +75,11 @@ export interface UserRegistration extends BaseRegistration {
 // Agency owner registration
 export interface AgencyOwnerRegistration extends BaseRegistration {
   role: 'agency_owner';
-  agency_name?: string;
+  agency_name: string;
   license_number: string;
   agency_email?:string;
   phone?: string;
-  address?: string;
+  address: string;
   agency_website?: string;
 }
 

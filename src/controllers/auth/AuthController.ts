@@ -2,11 +2,11 @@ import { Request, Response , NextFunction } from 'express';
 import { AuthService } from '../../services/AuthServices/AuthService.js';
 import { validateRegistrationInputAsync } from '../../validators/authValidatorAsync.js';
 import { LoginRequest } from "../../types/auth.js"; 
-
+import { RegistrationData } from '../../types/auth.js';
 import { ValidationError } from '../../errors/BaseError.js';
 
 export async function register(
-  req: Request,
+  req: Request <{}, {}, RegistrationData>,
   res: Response,
   next: NextFunction
 ): Promise<void> {

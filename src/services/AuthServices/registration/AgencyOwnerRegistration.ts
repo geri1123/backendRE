@@ -3,9 +3,9 @@ import { UserInserts } from '../../../repositories/user/index.js';
 import { AgencyInserts    } from '../../../repositories/agency/index.js';
 import { EmailService } from '../../emailServices/verificationEmailservice.js';
 import { generateToken } from '../../../utils/hash.js';
-
+import { AgencyOwnerRegistration as AgencyOwnerRegistrationType } from '../../../types/auth.js';
 export class AgencyOwnerRegistration {
-  static async register(body: any): Promise<number> {
+  static async register(body: AgencyOwnerRegistrationType): Promise<number> {
     const {
       username, email, password,
       first_name, last_name,

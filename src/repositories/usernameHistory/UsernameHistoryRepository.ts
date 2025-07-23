@@ -3,7 +3,7 @@ import { username_history } from "../../db/schema/username_history.js";
 import { eq } from "drizzle-orm";
 import { desc } from "drizzle-orm";
 import { UsernameHistoryRecord } from "../../types/database.js";
-
+import { NewUsernameHistoryRecord } from "../../types/database.js";
 export class UsernameHistoryRepository {
   static async getLastUsernameChange(userId: number): Promise<UsernameHistoryRecord  | null> {
     const result = await db
@@ -16,17 +16,19 @@ export class UsernameHistoryRepository {
     return result[0] || null;
   }
 
-  static async saveUsernameChange(
-    userId: number,
-    oldUsername: string,
-    newUsername: string,
-    nextUpdateDate: Date
-  ): Promise<void> {
-    await db.insert(username_history).values({
-      user_id: userId,
-      old_username: oldUsername,
-      new_username: newUsername,
-      next_username_update: nextUpdateDate,
-    });
-  }
+static async saveUsernameChange(
+  userId: number,
+  oldUsername: string,
+  newUsername: string,
+  nextUpdateDate: Date
+): Promise<void> {
+  const record: NewUsernameHistoryRecord = {
+    user_id: userId,
+    old_username: oldUsername,
+    new_username: newUsername,
+    next_username_update: nextUpdateDate,
+  };
+
+  await db.insert(username_history).values(record);
+}
 }

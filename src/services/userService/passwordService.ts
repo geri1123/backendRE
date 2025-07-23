@@ -1,42 +1,35 @@
 import { comparePassword, hashPassword } from "../../utils/hash.js";
-import { UserQueries  , UserUpdates} from "../../repositories/user/index.js";
-import { NotFoundError, UnauthorizedError, ValidationError } from "../../errors/BaseError.js";
+import { UserQueries, UserUpdates } from "../../repositories/user/index.js";
+import { NotFoundError, ValidationError } from "../../errors/BaseError.js";
+import { sendPassemail } from "../../services/emailServices/passwordEmailService.js";
 
 export class PasswordService {
-  async getStoredPassword(userId: number): Promise<string> {
+  private async getStoredPassword(userId: number): Promise<string> {
     const storedPassword = await UserQueries.getUserPasswordById(userId);
     if (!storedPassword) {
       throw new NotFoundError("User not found.");
     }
     return storedPassword;
   }
-  async isCurrentPasswordValid(currentPassword: string, storedPassword: string): Promise<boolean> {
+
+  private async isCurrentPasswordValid(currentPassword: string, storedPassword: string): Promise<boolean> {
     return comparePassword(currentPassword, storedPassword);
   }
 
-  async isNewPasswordSameAsCurrent(newPassword: string, storedPassword: string): Promise<boolean> {
+  private async isNewPasswordSameAsCurrent(newPassword: string, storedPassword: string): Promise<boolean> {
     return comparePassword(newPassword, storedPassword);
   }
 
-  
-  async hashNewPassword(newPassword: string): Promise<string> {
+  private async hashNewPassword(newPassword: string): Promise<string> {
     return hashPassword(newPassword);
   }
 
-  
-  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
-    await UserUpdates.updatePassword(userId, hashedPassword);
-  }
-
-  
-  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+  public async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
     const storedPassword = await this.getStoredPassword(userId);
 
     const validCurrent = await this.isCurrentPasswordValid(currentPassword, storedPassword);
     if (!validCurrent) {
-     if (!validCurrent) {
-  throw new ValidationError({ password: "Current password is incorrect." });
-}
+      throw new ValidationError({ password: "Current password is incorrect." });
     }
 
     const samePassword = await this.isNewPasswordSameAsCurrent(newPassword, storedPassword);
@@ -45,6 +38,17 @@ export class PasswordService {
     }
 
     const hashedNewPassword = await this.hashNewPassword(newPassword);
-    await this.updatePassword(userId, hashedNewPassword);
+    await UserUpdates.updateFieldsById(userId, { password: hashedNewPassword });
+
+    // Fetch full user to send email
+    const user = await UserQueries.findById(userId);
+    if (user?.email && user?.username) {
+      try {
+        await sendPassemail(user.email, user.username);
+      } catch (err) {
+        
+        console.error("Failed to send password change email:", err);
+      }
+    }
   }
 }

@@ -23,6 +23,8 @@ export class UserQueries {
         email: users.email,
         password: users.password,
         status: users.status,
+
+         agency_id: users.agency_id,
         role:users.role
       })
       .from(users)
@@ -73,9 +75,13 @@ export class UserQueries {
   }
 
   static async emailExists(email: string): Promise<boolean> {
-    const result = await db.select({ exists: users.email }).from(users).where(eq(users.email, email)).limit(1);
-    return result.length > 0;
-  }
+  const result = await db
+    .select({ count: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+  return result.length > 0;
+}
 
   static async usernameExists(username: string): Promise<boolean> {
     const result = await db.select({ exists: users.username }).from(users).where(eq(users.username, username)).limit(1);

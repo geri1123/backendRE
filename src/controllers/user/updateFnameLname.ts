@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError, ValidationError } from "../../errors/BaseError";
 import { UserUpdates } from "../../repositories/user/index.js";
+import { ProfileInfoService } from "../../services/userService/profileInfoService";
 interface UpdateFnameLname {
   firstName: string;
   lastName: string;
@@ -26,8 +27,8 @@ if (!lastName || lastName.trim() === "") {
 }
 
   try {
-       UserUpdates.updateFnmLnm(userId, firstName, lastName);
-    res.status(200).json({ message: "Name updated successfully" });
+    const profileinfoService=new ProfileInfoService();
+await profileinfoService.updateFirstNlastN(userId, firstName, lastName);    res.status(200).json({ message: "Name updated successfully" });
   } catch (err) {
     next(err);
   }

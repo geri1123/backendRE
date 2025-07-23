@@ -14,7 +14,7 @@ export async function updateProfileImage(req: Request, res: Response , next:Next
     return;
   }
 if (!req.userId) {
-      // Throw your custom UnauthorizedError instead of sending response here
+      
       throw new UnauthorizedError('User not authenticated');
     }
 

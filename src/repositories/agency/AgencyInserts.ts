@@ -1,35 +1,31 @@
 import { generatePublicCode } from "../../utils/hash.js";
 import { db } from "../../config/db.js";
 import { agencies } from "../../db/schema/agencies.js";
+import { NewAgency } from "../../types/database.js";
 import { eq } from "drizzle-orm";
 export class AgencyInserts{
-   static async create(agencyData: {
-       agency_name: string;
-       license_number: string;
-       phone?: string;
-       address?: string;
-     }): Promise<number> {
-       let publicCode: string;
-   
-       // Generate unique public code
-       do {
-         publicCode = generatePublicCode();
-       } while (await this.publicCodeExists(publicCode));
-   
-       const [result] = await db.insert(agencies).values({
-         agency_name: agencyData.agency_name,
-         public_code: publicCode,
-         license_number: agencyData.license_number,
-         agency_email: null, 
-         phone: agencyData.phone ?? null,
-         address: agencyData.address ?? null,
-         status: 'inactive',
-         created_at: new Date(),
-         updated_at: new Date(),
-       });
-   
-       return result.insertId;
-     }
+   static async create(
+    agencyData: Omit<NewAgency, 'id' | 'created_at' | 'updated_at' | 'public_code' | 'status' | 'agency_email'> & {
+      agency_email?: string | null; // optionally override if needed
+    }
+  ): Promise<number> {
+    let publicCode: string;
+
+    do {
+      publicCode = generatePublicCode();
+    } while (await this.publicCodeExists(publicCode));
+
+    const [result] = await db.insert(agencies).values({
+      ...agencyData,
+      public_code: publicCode,
+      status: 'inactive',
+      agency_email: agencyData.agency_email ?? null,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    return result.insertId;
+  }
       private static async publicCodeExists(publicCode: string): Promise<boolean> {
         const result = await db
           .select()

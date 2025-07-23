@@ -45,39 +45,12 @@ async login(identifier: string, password: string) {
   }
 
   const token = jwt.sign(
-    { userId: user.id, username: user.username, email: user.email , role:user.role },
+    { userId: user.id, username: user.username, email: user.email , role:user.role,agencyId: user.agency_id ?? null },
     config.secret.jwtSecret as string,
     { expiresIn: '1d' }
   );
 
   return { user, token };
 }
-  // async login(identifier: string, password: string) {
-  //     const user = await UserRepository.findByIdentifier(identifier);
   
-  //     if (!user) {
-  //       throw new Error('Invalid credentials');
-  //     }
-  
-  //     if (user.status !== 'active') {
-  //       throw new Error('Account is not active. Please contact support or verify your email.');
-  //     }
-  
-  //     const isMatch = await comparePassword(password, user.password);
-  //     if (!isMatch) {
-  //       throw new Error('Invalid password.');
-  //     }
-  
-  //     const token = jwt.sign(
-  //       {
-  //         userId: user.id,
-  //         username: user.username,
-  //         email: user.email,
-  //       },
-  //       config.secret.jwtSecret as string,
-  //       { expiresIn: '1d' }
-  //     );
-  
-  //     return { user, token };
-  //   }
 }
