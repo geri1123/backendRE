@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
-
+import { UserUpdates } from '../repositories/user/UserUpdates.js';
 interface DecodedToken {
   userId: number;
   username: string;
@@ -14,11 +14,12 @@ declare global {
     interface Request {
       user?: DecodedToken;
       userId?: number;
+      agencyId?:number;
     }
   }
 }
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<void>=> {
   const authHeader = req.headers.authorization;
   const token =
     req.cookies?.token ||
@@ -33,6 +34,10 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction): vo
     const decoded = jwt.verify(token, config.secret.jwtSecret as string) as DecodedToken;
     req.user = decoded;
     req.userId = decoded.userId;
+     if (decoded.agencyId) {
+    req.agencyId = decoded.agencyId;
+  }
+    await UserUpdates.setLastActive(req.userId)
     next();
   } catch (error) {
      res.status(401).json({ error: 'unauthorized', message: 'Invalid or expired token' });

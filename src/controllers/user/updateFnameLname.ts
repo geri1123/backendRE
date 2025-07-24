@@ -1,35 +1,36 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError, ValidationError } from "../../errors/BaseError";
-import { UserUpdates } from "../../repositories/user/index.js";
+import { updateNameSchema } from "../../validators/users/updateNameSchema.js";
+
 import { ProfileInfoService } from "../../services/userService/profileInfoService";
-interface UpdateFnameLname {
-  firstName: string;
-  lastName: string;
-}
+import { handleZodError } from "../../validators/zodErrorFormated";
 
 export async function updateFnameLname(
-  req: Request<any, any, UpdateFnameLname>,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const userId = req.userId; 
+  const userId = req.userId;
 
-  if (!userId) throw new UnauthorizedError("User not authenticated");
-
-  const { firstName, lastName } = req.body;
-
- if (!firstName || firstName.trim() === "") {
-  throw new ValidationError({ firstName: "First name must not be empty" });
-}
-
-if (!lastName || lastName.trim() === "") {
-  throw new ValidationError({ lastName: "Last name must not be empty" });
-}
+  if (!userId) {
+    throw new UnauthorizedError("User not authenticated");
+  }
 
   try {
-    const profileinfoService=new ProfileInfoService();
-await profileinfoService.updateFirstNlastN(userId, firstName, lastName);    res.status(200).json({ message: "Name updated successfully" });
+    const { firstName, lastName } = updateNameSchema.parse(req.body);
+
+    const profileinfoService = new ProfileInfoService();
+    await profileinfoService.updateFirstNlastN(
+       userId,
+     firstName,
+      lastName,
+    );
+
+    res.status(200).json({ message: "Name updated successfully" });
   } catch (err) {
-    next(err);
+    
+return handleZodError(err, next);
+   
+    
   }
 }

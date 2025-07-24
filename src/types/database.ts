@@ -7,7 +7,10 @@ import { username_history } from '../db/schema/username_history.js';
 // Generated types from schema
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
-
+export type UpdatableUserFields = Partial<Pick<
+  NewUser,
+  'first_name' | 'last_name' | 'username' | 'email' | 'phone' | 'about_me' | 'password'| 'profile_img'
+>>;
 export type Agency = InferSelectModel<typeof agencies>;
 export type NewAgency = InferInsertModel<typeof agencies>;
 
@@ -21,7 +24,7 @@ export type NewUsernameHistoryRecord = InferInsertModel<typeof username_history>
 export type PartialUserForLogin = Pick<User, 'id' | 'username' | 'email' | 'password' | 'status'| 'role' | 'agency_id'>;
 export type PartialUserByToken = Pick<User, 'id' | 'role' | 'email' | 'first_name' | 'agency_id'>;
 
-// Frontend-friendly types (convert tinyint to boolean)
+// (convert tinyint to boolean)
 export interface UserWithBooleans extends Omit<User, 'email_verified'> {
   email_verified: boolean;
 }

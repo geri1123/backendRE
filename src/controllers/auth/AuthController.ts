@@ -1,36 +1,35 @@
 import { Request, Response , NextFunction } from 'express';
 import { AuthService } from '../../services/AuthServices/AuthService.js';
-import { validateRegistrationInputAsync } from '../../validators/authValidatorAsync.js';
+
 import { LoginRequest } from "../../types/auth.js"; 
 import { RegistrationData } from '../../types/auth.js';
 import { ValidationError } from '../../errors/BaseError.js';
+import { loginValidation } from '../../validators/users/loginValidation.js';
+import { handleZodError } from '../../validators/zodErrorFormated.js';
+import { registrationSchema } from '../../validators/users/authValidatorAsync.js';
+
+//register
 
 export async function register(
-  req: Request <{}, {}, RegistrationData>,
+  req: Request<{}, {}, RegistrationData>,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    await validateRegistrationInputAsync(req.body);
-    const result = await AuthService.registerUserByRole(req.body);
-    res.status(201).json({ message: "Registration successful. Please verify your email.", userId: result });
-  } catch (error) {
-    next(error);
+    await registrationSchema.parseAsync(req.body);
+    const userId = await AuthService.registerUserByRole(req.body);
+    res.status(201).json({
+      message: "Registration successful. Please verify your email.",
+      userId,
+    });
+  } catch (err) {
+    handleZodError(err, next);
   }
 }
+//login
 export async function loginUser(req: Request<{}, {}, LoginRequest>, res: Response , next:NextFunction): Promise<void> {
-  const { identifier, password } = req.body;
-      if (!identifier || !password) {
-    // Throw a custom ValidationError here
-    throw new ValidationError({
-      identifier: !identifier ? 'Email is required' : '',
-      password: !password ? 'Password is required' : '',
-    });
-  }
-  
-
   try {
-    
+    const { identifier, password } = loginValidation.parse(req.body);
     const authService = new AuthService();
     const { user, token } = await authService.login(identifier, password);
 
@@ -47,7 +46,7 @@ export async function loginUser(req: Request<{}, {}, LoginRequest>, res: Respons
       message: 'Login successful',
       user: { id: user.id, username: user.username, email: user.email },
     });
-  } catch (error) {
-      next(error);
+  } catch (err) {
+      return handleZodError(err, next)
   }
 }

@@ -21,11 +21,7 @@ export class UnauthorizedError extends BaseError {
     super(message, 401, errors);
   }
 }
-// export class UnauthorizedError extends BaseError {
-//   constructor(message = "Unauthorized") {
-//     super(message, 401);
-//   }
-// }
+
 export class ForbiddenError extends BaseError {
   constructor(message = "Forbidden") {
     super(message, 403);
@@ -40,5 +36,10 @@ export class NotFoundError extends BaseError {
  export class FileSystemError extends BaseError {
   constructor(message: string) {
     super(message, 500);
+  }
+}
+export class TooManyRequestsError extends BaseError {
+  constructor(message = "Too many requests") {
+    super(message, 429);
   }
 }

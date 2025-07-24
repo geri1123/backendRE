@@ -15,13 +15,24 @@ static async activateAgency(agencyId: number): Promise<void> {
 
 static async updateAgencyFields(
   agencyId: number,
-  fields: Partial<NewAgency>
+  fields: Partial<Omit<NewAgency, 'id' | 'created_at' | 'public_code' | 'updated_at'>>
 ): Promise<void> {
+  const allowedFields = [
+    'agency_name', 'logo', 'license_number', 'agency_email',
+    'phone', 'address', 'website', 'status',
+  ] as const;
+
   const filtered = Object.fromEntries(
-    Object.entries(fields).filter(([_, val]) => val !== undefined)
+    Object.entries(fields)
+      .filter(
+        ([key, val]) =>
+          val !== undefined && allowedFields.includes(key as typeof allowedFields[number])
+      )
   ) as Partial<NewAgency>;
 
-  filtered.updated_at = new Date(); 
-  await db.update(agencies).set(filtered).where(eq(agencies.id, agencyId));
+  await db
+    .update(agencies)
+    .set({ ...filtered, updated_at: new Date() })
+    .where(eq(agencies.id, agencyId));
 }
 }

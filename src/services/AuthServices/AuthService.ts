@@ -7,7 +7,7 @@ import { UnauthorizedError } from '../../errors/BaseError.js';
 import jwt from 'jsonwebtoken';
 import { comparePassword } from '../../utils/hash.js';
 import { config } from '../../config/config.js';
-import { UserQueries } from '../../repositories/user/index.js';
+import { UserQueries, UserUpdates } from '../../repositories/user/index.js';
 
 
 
@@ -43,7 +43,7 @@ async login(identifier: string, password: string) {
   if (!isMatch) {
     throw new UnauthorizedError('Invalid password.');
   }
-
+await UserUpdates.setLastLogin(user.id);
   const token = jwt.sign(
     { userId: user.id, username: user.username, email: user.email , role:user.role,agencyId: user.agency_id ?? null },
     config.secret.jwtSecret as string,

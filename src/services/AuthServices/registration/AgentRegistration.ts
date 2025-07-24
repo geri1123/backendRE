@@ -43,6 +43,7 @@ export class AgentRegistration {
       status: "pending",
       agency_name: agency.agency_name,
       agency_id: agency.id,
+        request_type: 'agent_license_verification'
     });
 
     await EmailService.sendVerificationEmail(email, `${first_name} ${last_name}`, verification_token);

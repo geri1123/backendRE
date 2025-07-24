@@ -1,40 +1,34 @@
 import { NextFunction, Request, Response } from "express";
-import { validateUsernameInput } from "../../validators/changeUsernameValidation.js";
 import { UsernameService } from "../../services/userService/UserNameHistory.js";
-import { ValidationError } from "../../errors/BaseError.js";
-import { UnauthorizedError } from "../../errors/BaseError.js";
-interface ChangeUsernameBody {
-  username: string;
-}
+import { TooManyRequestsError, UnauthorizedError } from "../../errors/BaseError.js";
+import { changeUsernameSchema } from "../../validators/users/updateUsernameSchema.js";
+import { ZodError } from "zod";
+import { handleZodError } from "../../validators/zodErrorFormated.js";
+import { ChangeUsernameBody } from "../../validators/users/updateUsernameSchema.js";
 export async function changeUsername(
   req: Request<{}, {}, ChangeUsernameBody>,
   res: Response,
-  next:NextFunction
+  next: NextFunction
 ): Promise<void> {
   const userId = req.userId;
-  const { username } = req.body;
-
   if (!userId) {
-    throw new UnauthorizedError('User not authenticated');
+    return next(new UnauthorizedError('User not authenticated'));
   }
 
-  const validation = validateUsernameInput(username);
- 
-if (!validation.valid) {
-  throw new ValidationError(validation.errors || {});
-}
-  const service = new UsernameService();
-
   try {
+    const { username } = changeUsernameSchema.parse(req.body);
+
+    const service = new UsernameService();
+
     const canUpdate = await service.canUpdateUsername(userId);
     if (!canUpdate) {
-      res.status(429).json({ error: "You can only update your username once every 10 days." });
-      return;
-    }
-
+  throw new TooManyRequestsError("You can only update your username once every 10 days.");
+}
     await service.changeUsername(userId, username);
     res.json({ success: true, message: "Username updated successfully." });
   } catch (err) {
-    next(err)
+    
+      return handleZodError(err, next);
+   
   }
 }

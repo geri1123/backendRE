@@ -5,9 +5,7 @@ import { NewAgency } from "../../types/database.js";
 import { eq } from "drizzle-orm";
 export class AgencyInserts{
    static async create(
-    agencyData: Omit<NewAgency, 'id' | 'created_at' | 'updated_at' | 'public_code' | 'status' | 'agency_email'> & {
-      agency_email?: string | null; // optionally override if needed
-    }
+    agencyData: Omit<NewAgency, 'id' | 'created_at' | 'updated_at' | 'public_code' | 'status' > 
   ): Promise<number> {
     let publicCode: string;
 
@@ -20,8 +18,7 @@ export class AgencyInserts{
       public_code: publicCode,
       status: 'inactive',
       agency_email: agencyData.agency_email ?? null,
-      created_at: new Date(),
-      updated_at: new Date(),
+     
     });
 
     return result.insertId;
