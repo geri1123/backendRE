@@ -47,16 +47,16 @@ export class UserUpdates {
       updated_at: new Date(),
     }).where(eq(users.id, userId));
   }
-  static async setLastLogin(userId:number):Promise<void>{
-    await db.update(users).set({
-      last_login: new Date()
-    }).where(eq(users.id, userId));
+  // static async setLastLogin(userId:number):Promise<void>{
+  //   await db.update(users).set({
+  //     last_login: new Date()
+  //   }).where(eq(users.id, userId));
 
-  }
-   static async setLastActive(userId:number):Promise<void>{
-    await db.update(users).set({
-      last_active: new Date()
-    }).where(eq(users.id, userId));
+  // }
+  //  static async setLastActive(userId:number):Promise<void>{
+  //   await db.update(users).set({
+  //     last_active: new Date()
+  //   }).where(eq(users.id, userId));
 
-  }
+  // }
 }

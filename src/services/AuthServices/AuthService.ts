@@ -14,7 +14,6 @@ import { UserQueries, UserUpdates } from '../../repositories/user/index.js';
 export class AuthService {
   static async registerUserByRole(body:RegistrationData): Promise<number> {
     const role = body.role;
-
     switch(role) {
       case 'user':
         return UserRegistration.register(body);
@@ -43,7 +42,8 @@ async login(identifier: string, password: string) {
   if (!isMatch) {
     throw new UnauthorizedError('Invalid password.');
   }
-await UserUpdates.setLastLogin(user.id);
+// await UserUpdates.setLastLogin(user.id);
+await UserUpdates.updateFieldsById(user.id ,{ last_login: new Date() })
   const token = jwt.sign(
     { userId: user.id, username: user.username, email: user.email , role:user.role,agencyId: user.agency_id ?? null },
     config.secret.jwtSecret as string,

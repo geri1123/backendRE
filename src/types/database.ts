@@ -9,8 +9,10 @@ export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
 export type UpdatableUserFields = Partial<Pick<
   NewUser,
-  'first_name' | 'last_name' | 'username' | 'email' | 'phone' | 'about_me' | 'password'| 'profile_img'
+  'first_name' | 'last_name' | 'username' | 'email' | 'phone' | 'about_me' | 'password'| 'profile_img'| 'last_login' | 'last_active'
 >>;
+
+
 export type Agency = InferSelectModel<typeof agencies>;
 export type NewAgency = InferInsertModel<typeof agencies>;
 

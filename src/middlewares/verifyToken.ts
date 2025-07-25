@@ -2,13 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { UserUpdates } from '../repositories/user/UserUpdates.js';
-interface DecodedToken {
+interface DecodedToken extends jwt.JwtPayload {
   userId: number;
   username: string;
   role: string;
   agencyId?: number | null;
 }
-
 declare global {
   namespace Express {
     interface Request {
@@ -37,7 +36,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
      if (decoded.agencyId) {
     req.agencyId = decoded.agencyId;
   }
-    await UserUpdates.setLastActive(req.userId)
+    await UserUpdates.updateFieldsById(req.userId, {last_active:new Date})
     next();
   } catch (error) {
      res.status(401).json({ error: 'unauthorized', message: 'Invalid or expired token' });
