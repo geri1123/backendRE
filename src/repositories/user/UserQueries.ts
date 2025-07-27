@@ -24,7 +24,7 @@ export class UserQueries {
         password: users.password,
         status: users.status,
 
-         agency_id: users.agency_id,
+        //  agency_id: users.agency_id,
         role:users.role
       })
       .from(users)
@@ -40,7 +40,7 @@ export class UserQueries {
         role: users.role,
         email: users.email,
         first_name: users.first_name,
-        agency_id: users.agency_id,
+        // agency_id: users.agency_id,
       })
       .from(users)
       .where(

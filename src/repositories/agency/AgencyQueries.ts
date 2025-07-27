@@ -13,6 +13,15 @@ export class AgencyQueries{
     
       return result.length > 0;
     }
+     static async findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null> {
+    const result = await db
+      .select({ id: agencies.id })
+      .from(agencies)
+      .where(eq(agencies.owner_user_id, ownerUserId))
+      .limit(1);
+
+    return result[0] || null;
+  }
     //  static async emailExists(email:string): Promise<boolean>{
     //   const result=await db.select({exists:agencies.agency_email})
     //  }

@@ -25,33 +25,46 @@ export class RegistrationRequestRepository {
 
     return result.length > 0;
   }
- static async findAgentRequestsByAgencyId(agencyId: number , limit:number , offset:number):Promise<AgentRequestQueryResult[]> {
-    return db
-      .select({
-        
-        requestType: registration_requests.request_type,
-        idCardNumber: registration_requests.id_card_number,
-        status: registration_requests.status,
-        username: users.username,
-        email: users.email,
-        firstName: users.first_name,
-        lastName: users.last_name,
-       emailVerified: users.email_verified, 
-       createdAt:registration_requests.created_at,
-      })
-      .from(registration_requests)
-      .innerJoin(users, eq(registration_requests.user_id, users.id))
-      .where(
-        and(
-          eq(users.agency_id, agencyId),
-          eq(registration_requests.request_type, 'agent_license_verification'),
-          eq(users.email_verified , 1)
-        )
-      )  
-      .limit(limit)
-    .offset(offset);;
-  }
+  static async findAgentRequestsByAgencyId(
+  agencyId: number,
+  limit: number,
+  offset: number
+): Promise<{ data: AgentRequestQueryResult[]; total: number }> {
+  const baseWhere = and(
+    // eq(users.agency_id, agencyId),
+    eq(registration_requests.request_type, 'agent_license_verification'),
+    eq(users.email_verified, 1)
+  );
 
+  const dataQuery = db
+    .select({
+      requestType: registration_requests.request_type,
+      idCardNumber: registration_requests.id_card_number,
+      status: registration_requests.status,
+      username: users.username,
+      email: users.email,
+      firstName: users.first_name,
+      lastName: users.last_name,
+      emailVerified: users.email_verified,
+      createdAt: registration_requests.created_at,
+    })
+    .from(registration_requests)
+    .innerJoin(users, eq(registration_requests.user_id, users.id))
+    .where(baseWhere)
+    .orderBy(sql`${registration_requests.created_at} DESC`)
+    .limit(limit)
+    .offset(offset);
+
+  const countQuery = db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(registration_requests)
+    .innerJoin(users, eq(registration_requests.user_id, users.id))
+    .where(baseWhere);
+
+  const [data, [{ count }]] = await Promise.all([dataQuery, countQuery]);
+
+  return { data, total: count };
+}
   
 static async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
   const result = await db
@@ -60,7 +73,7 @@ static async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
     .innerJoin(users, eq(registration_requests.user_id, users.id))
     .where(
       and(
-        eq(users.agency_id, agencyId),
+        // eq(users.agency_id, agencyId),
         eq(registration_requests.request_type, 'agent_license_verification'),
         eq(users.email_verified, 1)
       )

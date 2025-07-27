@@ -12,6 +12,6 @@
     "skipLibCheck": true
   },
   
-  "include": ["src" ,"types"],
+  "include": ["src" ,"types", "drizzle.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

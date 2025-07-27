@@ -17,6 +17,7 @@ export const config = {
   email: {
     emailuser: process.env.EMAIL_USER || '',
     emailpass: process.env.EMAIL_PASS || '',
+    emailservice:process.env.EMAIL_SERVICE || 'gmail',
   },
   secret: {
     jwtSecret: process.env.JWT_SECRET ,

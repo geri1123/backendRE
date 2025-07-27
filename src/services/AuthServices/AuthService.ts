@@ -45,7 +45,10 @@ async login(identifier: string, password: string) {
 // await UserUpdates.setLastLogin(user.id);
 await UserUpdates.updateFieldsById(user.id ,{ last_login: new Date() })
   const token = jwt.sign(
-    { userId: user.id, username: user.username, email: user.email , role:user.role,agencyId: user.agency_id ?? null },
+    { userId: user.id, username: user.username, email: user.email , role:user.role 
+
+        // ,agencyId: user.agency_id || null,
+    },
     config.secret.jwtSecret as string,
     { expiresIn: '1d' }
   );

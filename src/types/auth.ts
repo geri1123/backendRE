@@ -87,7 +87,7 @@ export interface AgencyOwnerRegistration extends BaseRegistration {
 export interface AgentRegistration extends BaseRegistration {
   role: 'agent';
   agency_name?:string;
-  
+  requested_role:string;
   public_code: string;
   id_card_number: string;
 }

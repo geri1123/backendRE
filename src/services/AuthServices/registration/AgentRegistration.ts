@@ -31,7 +31,7 @@ export class AgentRegistration {
     const userId = await UserInserts.create({
       ...baseData,
       role: 'agent',
-      agency_id: agency.id,
+      
       status: 'inactive',
       verification_token,
       verification_token_expires
@@ -43,6 +43,7 @@ export class AgentRegistration {
       status: "pending",
       agency_name: agency.agency_name,
       agency_id: agency.id,
+      requested_role:"agent",
         request_type: 'agent_license_verification'
     });
 

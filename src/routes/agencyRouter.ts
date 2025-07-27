@@ -7,4 +7,5 @@ const router = express.Router();
 
 router.patch('/update-website', verifyToken, requireAgencyOwner,updateAgencyInfo);
 router.get('/getAgentsRequest' , verifyToken , requireAgencyOwner , AgentRequestController.getRequests)
+router.patch('/agent-request/respond' , verifyToken ,requireAgencyOwner ,AgentRequestController.respondToRequest  ) 
 export default router;

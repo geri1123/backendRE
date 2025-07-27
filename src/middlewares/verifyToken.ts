@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
 import { UserUpdates } from '../repositories/user/UserUpdates.js';
+import { AgencyQueries } from '../repositories/agency/AgencyQueries.js';
 interface DecodedToken extends jwt.JwtPayload {
   userId: number;
   username: string;
@@ -33,9 +34,13 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     const decoded = jwt.verify(token, config.secret.jwtSecret as string) as DecodedToken;
     req.user = decoded;
     req.userId = decoded.userId;
-     if (decoded.agencyId) {
-    req.agencyId = decoded.agencyId;
-  }
+    if (decoded.role === 'agency_owner') {
+      const agency = await AgencyQueries.findByOwnerUserId(decoded.userId);
+      if (agency) {
+        req.agencyId = agency.id;
+      }
+    }
+
     await UserUpdates.updateFieldsById(req.userId, {last_active:new Date})
     next();
   } catch (error) {
