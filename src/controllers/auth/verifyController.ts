@@ -5,6 +5,7 @@ import { UserQueries, UserUpdates} from '../../repositories/user/index.js';
 import { AgencyUpdates } from '../../repositories/agency/index.js';
 import { ValidationError, NotFoundError } from '../../errors/BaseError.js';
 import { generateToken } from '../../utils/hash.js';
+import { AgencyQueries } from '../../repositories/agency/index.js';
 export async function verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const token = req.query.token;
@@ -19,13 +20,19 @@ export async function verifyEmail(req: Request, res: Response, next: NextFunctio
       throw new NotFoundError('Invalid or expired verification token.');
     }
 
-    const emailVerified = 1;
+    const emailVerified = true;
     const statusToUpdate = user.role === 'agent' ? 'pending' : 'active';
 
     await UserUpdates.verifyEmail(user.id, emailVerified, statusToUpdate);
 
-    if (user.role === 'agency_owner' && user.agency_id) {
-      await AgencyUpdates.activateAgency(user.agency_id);
+ 
+
+
+    if (user.role === 'agency_owner') {
+      const agency = await AgencyQueries.findByOwnerUserId(user.id);
+      if (agency) {
+        await AgencyUpdates.activateAgency(agency.id);
+      }
     }
  const safeFirstName = user.first_name ?? 'User';
     if (user.role === 'agent') {

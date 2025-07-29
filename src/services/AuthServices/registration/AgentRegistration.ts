@@ -10,8 +10,8 @@ export class AgentRegistration {
     const {
       username, email, password,
       first_name, last_name,
-      public_code, id_card_number,  terms_accepted,
-    } = body;
+      public_code, id_card_number , requested_role
+    } = body  as AgentRegistrationType;
 
     const baseData: BaseRegistration = {
       username,
@@ -19,7 +19,7 @@ export class AgentRegistration {
       password,
       first_name,
       last_name,
-        terms_accepted
+        // terms_accepted
     };
 
     const verification_token = generateToken();
@@ -43,7 +43,7 @@ export class AgentRegistration {
       status: "pending",
       agency_name: agency.agency_name,
       agency_id: agency.id,
-      requested_role:"agent",
+      requested_role,
         request_type: 'agent_license_verification'
     });
 

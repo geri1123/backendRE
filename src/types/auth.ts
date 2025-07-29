@@ -5,14 +5,13 @@ export interface User {
   username: string;
   email: string;
   password: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
   about_me?: string;
   profile_img?: string;
   phone?: string;
   website?: string;
   role: 'user' | 'agency_owner' | 'agent';
-  agency_id?: number;
   status: UserStatus;
   email_verified: boolean;
   last_login?: Date;
@@ -26,16 +25,15 @@ export interface User {
 export interface Agency {
   id: number;
   agency_name: string;
-  public_code: string;
+  public_code?: string;
   logo?: string;
   license_number: string;
-  email: string;
+  agency_email?: string;
   phone?: string;
   address?: string;
   website?: string;
   status: 'active' | 'inactive' | 'suspended';
-  created_at: Date;
-  updated_at: Date;
+  owner_user_id: number;
 }
 
 export interface RegistrationRequest {
@@ -58,13 +56,13 @@ export interface BaseRegistration {
   username: string;
   email: string;
   password: string;
-   repeatPassword?: string;
+  repeatPassword?: string;
   first_name: string;
   last_name: string;
   phone?: string;
   about_me?: string;
   website?: string;
-  terms_accepted: boolean; 
+  // terms_accepted: boolean;
 }
 
 // User registration (simple user)
@@ -77,17 +75,15 @@ export interface AgencyOwnerRegistration extends BaseRegistration {
   role: 'agency_owner';
   agency_name: string;
   license_number: string;
-  agency_email?:string;
-  phone?: string;
+  agency_email?: string;
   address: string;
   agency_website?: string;
 }
-
 // Agent registration
 export interface AgentRegistration extends BaseRegistration {
   role: 'agent';
   agency_name?:string;
-  requested_role:string;
+  requested_role:'agent' | 'senior_agent' | 'team_lead';
   public_code: string;
   id_card_number: string;
 }

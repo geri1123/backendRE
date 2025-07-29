@@ -34,6 +34,7 @@ export const registrationSchema = z
     address: z.string().optional(),
     public_code: z.string().optional(),
     id_card_number: z.string().optional(),
+    requested_role: z.enum(["agent", "senior_agent", "team_lead"]).optional(),
   })
   .superRefine(async (data: z.infer<typeof registrationSchema>, ctx: RefinementCtx) => {
     // Password confirmation
@@ -65,8 +66,12 @@ export const registrationSchema = z
       if (!data.id_card_number?.trim()) {
         ctx.addIssue({ code: "custom",  message: "ID card number is required.", path: ["id_card_number"] });
       }
+      if (!data.requested_role?.trim()) {
+        ctx.addIssue({ code: "custom",  message: "Role in agency is required.", path: ["requested_role"] });
+      }
     }
-
+     
+   
     // Uniqueness checks
     if (await UserQueries.emailExists(data.email)) {
       ctx.addIssue({ code: "custom",  message: "Email already exists.", path: ["email"] });

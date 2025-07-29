@@ -1,0 +1,165 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                           Int                   @id @default(autoincrement())
+  username                     String                @unique
+  email                        String                @unique
+  password                     String
+  first_name                   String?
+  last_name                    String?
+  about_me                     String?               @db.Text
+  profile_img                  String?
+  phone                        String?
+  website                      String?
+  role                         UserRole
+  status                       UserStatus            @default(active)
+  email_verified               Boolean               @default(false)
+  last_login                   DateTime?
+  last_active                  DateTime?
+  created_at                   DateTime              @default(now())
+  updated_at                   DateTime              @updatedAt
+  verification_token           String?
+  verification_token_expires   DateTime?
+  agencies                     Agency?               @relation("OwnerUserAgencies")
+  agencyAgentsAdded            AgencyAgent[]         @relation("AgencyAgentAddedBy")
+  agencyAgents                 AgencyAgent[]         @relation("AgentUserAgencyAgents")
+  registrationRequestsReviewed RegistrationRequest[] @relation("ReviewerRequests")
+  registrationRequests         RegistrationRequest[] @relation("UserRequests")
+  usernameHistories            UsernameHistory[]
+}
+
+model Agency {
+  id                   Int                   @id @default(autoincrement())
+  agency_name          String
+  public_code          String?               @unique
+  logo                 String?
+  license_number       String                @unique
+  agency_email         String?
+  phone                String?
+  address              String?               @db.Text
+  website              String?
+  status               AgencyStatus          @default(active)
+  owner_user_id        Int                   @unique
+  owner                User                  @relation("OwnerUserAgencies", fields: [owner_user_id], references: [id])
+  agencyAgents         AgencyAgent[]
+  registrationRequests RegistrationRequest[] @relation("AgencyRequests")
+}
+
+model AgencyAgent {
+  id              Int          @id @default(autoincrement())
+  agency_id       Int
+  agent_id        Int
+  added_by        Int?
+  id_card_number  String?
+  role_in_agency  RoleInAgency @default(agent)
+  commission_rate Decimal?     @db.Decimal(5, 2)
+  start_date      DateTime?
+  end_date        DateTime?
+  status          AgentStatus  @default(active)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  addedBy         User?        @relation("AgencyAgentAddedBy", fields: [added_by], references: [id])
+  agency          Agency       @relation(fields: [agency_id], references: [id])
+  agent           User         @relation("AgentUserAgencyAgents", fields: [agent_id], references: [id])
+
+  @@unique([agency_id, agent_id])
+  @@index([added_by], map: "AgencyAgent_added_by_fkey")
+  @@index([agent_id], map: "AgencyAgent_agent_id_fkey")
+}
+
+model RegistrationRequest {
+  id                   Int            @id @default(autoincrement())
+  user_id              Int
+  request_type         RequestType
+  id_card_number       String?
+  agency_name          String?
+  agency_id            Int?
+  supporting_documents String?        @db.Text
+  status               RequestStatus  @default(pending)
+  reviewed_by          Int?
+  review_notes         String?        @db.Text
+  reviewed_at          DateTime?
+  requested_role       RequestedRole?
+  license_number       String?
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+  agency               Agency?        @relation("AgencyRequests", fields: [agency_id], references: [id])
+  reviewer             User?          @relation("ReviewerRequests", fields: [reviewed_by], references: [id])
+  user                 User           @relation("UserRequests", fields: [user_id], references: [id])
+
+  @@unique([user_id, request_type, status])
+  @@index([user_id])
+  @@index([reviewed_by])
+  @@index([agency_id])
+  @@index([status])
+  @@index([request_type])
+}
+
+model UsernameHistory {
+  id                   Int      @id @default(autoincrement())
+  user_id              Int
+  old_username         String
+  new_username         String
+  next_username_update DateTime @default(now()) @updatedAt
+  user                 User     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
+enum UserRole {
+  user
+  agency_owner
+  agent
+}
+
+enum UserStatus {
+  active
+  inactive
+  pending
+  suspended
+}
+
+enum AgencyStatus {
+  active
+  inactive
+  suspended
+}
+
+enum RoleInAgency {
+  agent
+  senior_agent
+  team_lead
+}
+
+enum AgentStatus {
+  active
+  inactive
+  terminated
+}
+
+enum RequestType {
+  agent_license_verification
+  agency_registration
+  role_change_request
+}
+
+enum RequestStatus {
+  pending
+  approved
+  rejected
+  under_review
+}
+
+enum RequestedRole {
+  agent
+  senior_agent
+   team_lead
+}

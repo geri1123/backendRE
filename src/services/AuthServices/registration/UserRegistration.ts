@@ -8,7 +8,7 @@ export class UserRegistration {
     const {
       username, email, password,
       first_name, last_name,
-        terms_accepted,
+        // terms_accepted,
     } = body;
 
     const baseData: BaseRegistration = {
@@ -17,7 +17,7 @@ export class UserRegistration {
       password,
       first_name,
       last_name,
-        terms_accepted
+        // terms_accepted
     };
 
     const verification_token = generateToken();

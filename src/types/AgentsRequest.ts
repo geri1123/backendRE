@@ -8,12 +8,16 @@ export type AgentRequestQueryResult = {
   email: string;
   firstName: string | null;
   lastName: string | null;
-  emailVerified: number | null;
+   emailVerified: boolean | null; 
    createdAt: Date; 
 };
 
 export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'under_review';
 export type RespondRequestBody = {
+  
   requestId: number;
   status: RequestStatus;
+  reviewerId: number;
+  reviewNotes?: string;
+  commissionRate?: number; 
 };
