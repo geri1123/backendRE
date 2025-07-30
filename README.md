@@ -67,7 +67,7 @@ PORT=8080
 
 # Node environment (can be development, production, or test)
 NODE_ENV=development
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/geri1123/backendRE
 cd your-repo
 
 # Install dependencies
