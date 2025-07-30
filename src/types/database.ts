@@ -25,16 +25,10 @@ export type UpdatableUserFields = Partial<Pick<
 
 export type AgencyModel = Agency;
 export type NewAgency = Prisma.AgencyCreateInput;
-
+export type NewAgencyUnchecked = Prisma.AgencyUncheckedCreateInput;
 export type RegistrationRequestModel = RegistrationRequest;
 export type NewRegistrationRequest = Prisma.RegistrationRequestCreateInput;
-export type CreateRegistrationRequestData = Omit<
-  Prisma.RegistrationRequestCreateInput,
-  'id' | 'created_at' | 'updated_at' | 'user' | 'agency' | 'reviewer'
-> & {
-  user_id: number;
-  agency_id?: number;
-};
+
 export type UsernameHistoryRecord = UsernameHistory;
 export type NewUsernameHistoryRecord = Prisma.UsernameHistoryCreateInput;
 

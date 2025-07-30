@@ -4,7 +4,9 @@ import { ValidationError, UnauthorizedError } from "../../errors/BaseError.js";
 import { changePasswordSchema } from "../../validators/users/updatePasswordSchema.js";
 import { handleZodError } from "../../validators/zodErrorFormated";
 import { ZodError } from "zod";
-const passwordService = new PasswordService();
+import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma.js";
+const userRepo = new UserRepositoryPrisma();
+const passwordService = new PasswordService(userRepo);
 
 export async function changePassword(
   req: Request,

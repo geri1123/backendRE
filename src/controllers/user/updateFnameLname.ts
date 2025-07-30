@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError, ValidationError } from "../../errors/BaseError";
 import { updateNameSchema } from "../../validators/users/updateNameSchema.js";
-
+import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma";
 import { ProfileInfoService } from "../../services/userService/profileInfoService";
 import { handleZodError } from "../../validators/zodErrorFormated";
 
+
+
+const userRepo = new UserRepositoryPrisma();
+const profileInfoService = new ProfileInfoService(userRepo);
 export async function updateFnameLname(
   req: Request,
   res: Response,
@@ -19,8 +23,8 @@ export async function updateFnameLname(
   try {
     const { firstName, lastName } = updateNameSchema.parse(req.body);
 
-    const profileinfoService = new ProfileInfoService();
-    await profileinfoService.updateFirstNlastN(
+   
+    await profileInfoService.updateFirstNlastN(
        userId,
      firstName,
       lastName,

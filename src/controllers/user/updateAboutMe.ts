@@ -1,12 +1,15 @@
-
-
+// backend/src/controllers/user/updateAboutMe.ts
 import type { Request, Response, NextFunction } from 'express';
 import { UnauthorizedError, ValidationError } from '../../errors/BaseError.js';
-
 import { ProfileInfoService } from '../../services/userService/profileInfoService.js';
+import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
+
 interface UpdateAboutMeBody {
   aboutMe: string;
 }
+
+const userRepo = new UserRepositoryPrisma();
+const profileInfoService = new ProfileInfoService(userRepo);
 
 export async function updateAboutMe(
   req: Request<{}, {}, UpdateAboutMeBody>,
@@ -22,8 +25,7 @@ export async function updateAboutMe(
   }
 
   try {
-    const prfInfoService=new ProfileInfoService();
-    await prfInfoService.updateAboutMe(userId, aboutMe.trim());
+    await profileInfoService.updateAboutMe(userId, aboutMe.trim());
     res.json({ success: true, message: 'About me updated successfully' });
   } catch (err) {
     next(err);

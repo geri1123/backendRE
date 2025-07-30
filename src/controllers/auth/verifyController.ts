@@ -1,11 +1,14 @@
 // src/controllers/authController.ts
 import { Request, Response, NextFunction } from 'express';
-import { EmailService } from '../../services/emailServices/verificationEmailservice.js';
-import { UserQueries, UserUpdates} from '../../repositories/user/index.js';
-import { AgencyUpdates } from '../../repositories/agency/index.js';
+import { VerificationEmail, WelcomeEmail, PendingApprovalEmail } from '../../services/emailServices/verificationEmailservice.js';
+import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
+import { AgencyRepository } from '../../repositories/agency/AgencyRepository.js';
 import { ValidationError, NotFoundError } from '../../errors/BaseError.js';
 import { generateToken } from '../../utils/hash.js';
-import { AgencyQueries } from '../../repositories/agency/index.js';
+
+
+const AgencyQueries = new AgencyRepository();
+const UserQueries = new UserRepositoryPrisma();
 export async function verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const token = req.query.token;
@@ -23,22 +26,29 @@ export async function verifyEmail(req: Request, res: Response, next: NextFunctio
     const emailVerified = true;
     const statusToUpdate = user.role === 'agent' ? 'pending' : 'active';
 
-    await UserUpdates.verifyEmail(user.id, emailVerified, statusToUpdate);
-
- 
-
+    await UserQueries.verifyEmail(user.id, emailVerified, statusToUpdate);
 
     if (user.role === 'agency_owner') {
       const agency = await AgencyQueries.findByOwnerUserId(user.id);
       if (agency) {
-        await AgencyUpdates.activateAgency(agency.id);
+        await AgencyQueries.activateAgency(agency.id);
       }
     }
- const safeFirstName = user.first_name ?? 'User';
+
+    const safeFirstName = user.first_name ?? 'User';
+
     if (user.role === 'agent') {
-      await EmailService.sendPendingApprovalEmail(user.email, safeFirstName);
+      const pendingEmail = new PendingApprovalEmail(user.email, safeFirstName);
+      const sent = await pendingEmail.send();
+      if (!sent) {
+        console.error(`Failed to send pending approval email to ${user.email}`);
+      }
     } else {
-      await EmailService.sendWelcomeEmail(user.email,safeFirstName);
+      const welcomeEmail = new WelcomeEmail(user.email, safeFirstName);
+      const sent = await welcomeEmail.send();
+      if (!sent) {
+        console.error(`Failed to send welcome email to ${user.email}`);
+      }
     }
 
     res.status(200).json({
@@ -46,9 +56,10 @@ export async function verifyEmail(req: Request, res: Response, next: NextFunctio
       message: 'Email verified successfully.',
     });
   } catch (error) {
-    next(error); 
+    next(error);
   }
 }
+
 export async function resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email } = req.body;
@@ -71,17 +82,19 @@ export async function resendVerificationEmail(req: Request, res: Response, next:
     const token = generateToken();
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-   
-    await UserUpdates.regenerateVerificationToken(user.id, token, expires);
-const name = user.first_name ?? 'User';  
-    // Send email with the token
-    await EmailService.sendVerificationEmail(user.email, token, name);
+    await UserQueries.regenerateVerificationToken(user.id, token, expires);
 
-    
+    const name = user.first_name ?? 'User';
+
+    const verificationEmail = new VerificationEmail(user.email, name, token);
+    const emailSent = await verificationEmail.send();
+    if (!emailSent) {
+      throw new Error('Failed to send verification email');
+    }
+
     res.status(200).json({
       success: true,
       message: 'Verification email resent.',
-      token, 
     });
   } catch (err) {
     next(err);

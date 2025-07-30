@@ -3,11 +3,12 @@ import { UnauthorizedError } from '../../errors/BaseError.js';
 import { updatePhoneSchema } from '../../validators/users/updatePhoneSchema.js'; 
 import { ProfileInfoService } from '../../services/userService/profileInfoService.js';
 import { handleZodError } from "../../validators/zodErrorFormated";
-import { ZodError } from 'zod';
+import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
 interface UpdatePhoneBody {
   phone: string;
 }
-
+const userRepo = new UserRepositoryPrisma();
+const profileInfoService = new ProfileInfoService(userRepo);
 export async function updatePhone(
   req: Request<{}, {}, UpdatePhoneBody>,
   res: Response,
@@ -20,8 +21,8 @@ export async function updatePhone(
     // Validate input
     const { phone } = updatePhoneSchema.parse(req.body);
 
-    const prfInfoService = new ProfileInfoService();
-    await prfInfoService.updateUserPhone(userId, phone.trim());
+    
+    await profileInfoService.updateUserPhone(userId, phone.trim());
 
     res.json({ success: true, message: 'Phone updated successfully' });
   } catch (err) {

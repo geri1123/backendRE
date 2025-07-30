@@ -1,10 +1,17 @@
+// AgentRequestController.ts
 import { Request, Response, NextFunction } from "express";
 import { ForbiddenError, UnauthorizedError } from "../../errors/BaseError.js";
 import { AgentsRequestsService } from "../../services/AgencyService/AgentsRequestsService.js";
 import { RespondRequestBody } from "../../types/AgentsRequest.js";
+import { AgentsRepository } from "../../repositories/agents/AgentRepository.js";
+import { RegistrationRequestRepository } from "../../repositories/registrationRequest/RegistrationRequest.js";
 
+// Initialize repositories
+const registrationRequestRepo = new RegistrationRequestRepository();
+const agentRepo = new AgentsRepository();
 
-const agentsRequestsService = new AgentsRequestsService();
+// Initialize service with dependencies
+const agentsRequestsService = new AgentsRequestsService(registrationRequestRepo, agentRepo);
 
 export class AgentRequestController {
   static async getRequests(req: Request, res: Response, next: NextFunction) {
@@ -38,8 +45,15 @@ export class AgentRequestController {
       const reviewerId = req.userId;
       if (!reviewerId) throw new UnauthorizedError("User not authenticated");
 
-      const { requestId, status, reviewNotes , commissionRate } = req.body;
-      await agentsRequestsService.respondToRequest(requestId, status, reviewerId, reviewNotes , commissionRate);
+      const { requestId, status, reviewNotes, commissionRate } = req.body;
+      
+      await agentsRequestsService.respondToRequest(
+        requestId, 
+        status, 
+        reviewerId, 
+        reviewNotes, 
+        commissionRate
+      );
 
       res.json({ message: `Request ${status} successfully` });
     } catch (err) {

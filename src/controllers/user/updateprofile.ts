@@ -1,4 +1,5 @@
 import type { Request, Response  , NextFunction} from 'express';
+import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
 import path from 'path';
 
 import { fileURLToPath } from 'url';
@@ -7,7 +8,8 @@ import { getFullImageUrl } from '../../utils/imageUrl.js';
 import { ProfileImageService } from '../../services/userService/profileImgService.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const userRepo = new UserRepositoryPrisma();
+const profileImageService = new ProfileImageService(userRepo);
 export async function updateProfileImage(req: Request, res: Response , next:NextFunction): Promise<void> {
   if (!req.file) {
     res.status(400).json({ error: 'No file uploaded' });
@@ -20,7 +22,7 @@ if (!req.userId) {
 
   try {
     const baseDir = path.resolve(__dirname, '..', '..', '..');
-    const newImagePath = await ProfileImageService.updateProfileImage(req.userId, req.file, baseDir);
+    const newImagePath = await profileImageService.updateProfileImage(req.userId, req.file, baseDir);
     const fullUrl = getFullImageUrl(newImagePath, req);
 
     res.json({ success: true, profilePicture: fullUrl });

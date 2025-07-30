@@ -11,3 +11,10 @@ export const verificationEmailTemplate = (name: string, verificationLink: string
     <p>The link will expire in 10 minutes.</p>
   </div>
 `;
+export const AgentRejectedEmailTemplate = (name: string) => `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <h2>Hello, ${name}!</h2>
+    <p>Your Request has been rejected by Agency owner  and you can not  login.</p>
+    <p>Thank you for your time!</p>
+  </div>
+`;   

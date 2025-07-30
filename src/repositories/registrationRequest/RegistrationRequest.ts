@@ -1,28 +1,19 @@
 import { PrismaClient, RequestType, RequestStatus, RequestedRole } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
 
-export const prisma = new PrismaClient();
+import { NewRegistrationRequest } from '../../types/database.js';
 
+import { prisma } from '../../config/prisma.js';
+import { AgentRequestQueryResult } from '../../types/AgentsRequest.js';
 
-export interface AgentRequestQueryResult {
-  requestType: RequestType;
-  idCardNumber: string | null;
-  status: RequestStatus;
-  username: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  emailVerified: boolean;
-  createdAt: Date;
-}
+import { IRegistrationRequestRepository } from './IRegistrationRequestRepository.js';
 
 
 
 
-export class RegistrationRequestRepository {
+export class RegistrationRequestRepository implements IRegistrationRequestRepository {
  
-  static async create(data:
-     Omit<Prisma.RegistrationRequestCreateInput,'id' | 'created_at' | 'updated_at' | 'user' | 'agency' | 'reviewer'> & {
+   async create(data:
+     Omit<NewRegistrationRequest,'id' | 'created_at' | 'updated_at' | 'user' | 'agency' | 'reviewer'> & {
   user_id: number;
   agency_id?: number;
 }): Promise<number> {
@@ -42,7 +33,7 @@ export class RegistrationRequestRepository {
     
     return result.id;
   }
-  static async idCardExists(idCard: string): Promise<boolean> {
+   async idCardExists(idCard: string): Promise<boolean> {
     const result = await prisma.registrationRequest.findFirst({
       where: {
         id_card_number: idCard,
@@ -53,7 +44,7 @@ export class RegistrationRequestRepository {
     return result !== null;
   }
 
-  static async findAgentRequestsByAgencyId(
+   async findAgentRequestsByAgencyId(
   agencyId: number,
   limit: number,
   offset: number
@@ -110,7 +101,7 @@ export class RegistrationRequestRepository {
   };
 }
  
-  static async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
+   async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
     return await prisma.registrationRequest.count({
       where: {
         // request_type: 'agent_license_verification',
@@ -128,7 +119,7 @@ export class RegistrationRequestRepository {
 
   
 
-  static async updateStatus(
+   async updateStatus(
     id: number,
     status: RequestStatus,
     reviewedBy?: number,
@@ -148,7 +139,7 @@ export class RegistrationRequestRepository {
   /**
    * Get all pending registration requests
    */
-  static async findPendingRequests(limit?: number) {
+   async findPendingRequests(limit?: number) {
     return await prisma.registrationRequest.findMany({
       where: {
         status: 'pending',
@@ -164,14 +155,14 @@ export class RegistrationRequestRepository {
         },
       },
       orderBy: {
-        created_at: 'asc', // Oldest first for FIFO processing
+        created_at: 'asc', 
       },
       ...(limit && { take: limit }),
     });
   }
 
   
-  static async findByUserId(userId: number) {
+   async findByUserId(userId: number) {
     return await prisma.registrationRequest.findMany({
       where: {
         user_id: userId,
@@ -182,28 +173,7 @@ export class RegistrationRequestRepository {
     });
   }
 
-  static async findByRequestType(requestType: RequestType, limit?: number) {
-    return await prisma.registrationRequest.findMany({
-      where: {
-        request_type: requestType,
-      },
-      include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-      ...(limit && { take: limit }),
-    });
-  }
-   static async findById(id: number) {
+    async findById(id: number) {
     return await prisma.registrationRequest.findUnique({
       where: { id },
       include: {

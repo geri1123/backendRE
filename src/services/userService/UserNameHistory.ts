@@ -1,21 +1,29 @@
-import { UserQueries, UserUpdates } from "../../repositories/user/index.js";
-import { UsernameHistoryRepository } from "../../repositories/usernameHistory/UsernameHistoryRepository.js";
 import { ValidationError, NotFoundError } from "../../errors/BaseError.js";
+import type { IUserRepository } from "../../repositories/user/IUserRepository.js";
+import type { IUsernameHistoryRepository } from "../../repositories/usernameHistory/IUsernameHistoryRepository.js";
 
 export class UsernameService {
+  private userRepo: IUserRepository;
+  private usernameHistoryRepo: IUsernameHistoryRepository;
+
+  constructor(userRepo: IUserRepository, usernameHistoryRepo: IUsernameHistoryRepository) {
+    this.userRepo = userRepo;
+    this.usernameHistoryRepo = usernameHistoryRepo;
+  }
+
   async canUpdateUsername(userId: number): Promise<boolean> {
-    const lastChange = await UsernameHistoryRepository.getLastUsernameChange(userId);
+    const lastChange = await this.usernameHistoryRepo.getLastUsernameChange(userId);
     if (!lastChange) return true;
     return new Date() >= new Date(lastChange.next_username_update);
   }
 
   async changeUsername(userId: number, newUsername: string): Promise<void> {
-    const usernameTaken = await UserQueries.usernameExists(newUsername);
+    const usernameTaken = await this.userRepo.usernameExists(newUsername);
     if (usernameTaken) {
       throw new ValidationError({ username: "Username already taken" });
     }
 
-    const currentUsername = await UserQueries.getUsernameById(userId);
+    const currentUsername = await this.userRepo.getUsernameById(userId);
     if (!currentUsername) {
       throw new NotFoundError("User not found");
     }
@@ -23,10 +31,9 @@ export class UsernameService {
     const nextUpdate = new Date();
     nextUpdate.setDate(nextUpdate.getDate() + 10);
 
-    // Use generic update method here:
-    await UserUpdates.updateFieldsById(userId, { username: newUsername });
+    await this.userRepo.updateFieldsById(userId, { username: newUsername });
 
-    await UsernameHistoryRepository.saveUsernameChange(
+    await this.usernameHistoryRepo.saveUsernameChange(
       userId,
       currentUsername,
       newUsername,

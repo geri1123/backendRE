@@ -1,15 +1,17 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { UserQueries, UserUpdates } from "../../repositories/user/index.js";
+import type { IUserRepository } from '../../repositories/user/IUserRepository.js';
 import { FileSystemError, NotFoundError } from '../../errors/BaseError.js';
 
 export class ProfileImageService {
-  static async updateProfileImage(
+  constructor(private userRepo: IUserRepository) {}
+
+  async updateProfileImage(
     userId: number,
     file: Express.Multer.File,
     baseDir: string
   ): Promise<string> {
-    const user = await UserQueries.findByIdForProfileImage(userId);
+    const user = await this.userRepo.findByIdForProfileImage(userId);
     if (!user) throw new NotFoundError('User not found');
 
     // Remove old image if it exists
@@ -26,7 +28,7 @@ export class ProfileImageService {
     }
 
     const newImagePath = `uploads/images/${file.filename}`;
-    await UserUpdates.updateFieldsById(userId, { profile_img: newImagePath });
+    await this.userRepo.updateFieldsById(userId, { profile_img: newImagePath });
 
     return newImagePath;
   }

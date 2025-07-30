@@ -1,17 +1,25 @@
 import { BaseRegistration } from '../../../types/auth.js';
-import { UserInserts } from '../../../repositories/user/index.js';
-import {  AgencyQueries } from '../../../repositories/agency/index.js';
-import { RegistrationRequestRepository } from '../../../repositories/registrationRequest/RegistrationRequest.js';
-import { EmailService } from '../../emailServices/verificationEmailservice.js';
+
+import { VerificationEmail } from '../../emailServices/verificationEmailservice.js';
 import { generateToken } from '../../../utils/hash.js';
-import { AgentRegistration as AgentRegistrationType } from '../../../types/auth.js';
+import type { AgentRegistration as AgentRegistrationType } from '../../../types/auth.js';
+import type { IUserRepository } from '../../../repositories/user/IUserRepository.js';
+import { IRegistrationRequestRepository } from '../../../repositories/registrationRequest/IRegistrationRequestRepository.js';
+import { IAgencyRepository } from '../../../repositories/agency/IAgencyRepository.js';
+
 export class AgentRegistration {
-  static async register(body: AgentRegistrationType): Promise<number> {
+  constructor(
+    private readonly userRepo: IUserRepository,
+    private readonly agencyRepo: IAgencyRepository,
+    private readonly requestRepo: IRegistrationRequestRepository
+  ) {}
+
+  async register(body: AgentRegistrationType): Promise<number> {
     const {
       username, email, password,
       first_name, last_name,
-      public_code, id_card_number , requested_role
-    } = body  as AgentRegistrationType;
+      public_code, id_card_number, requested_role
+    } = body;
 
     const baseData: BaseRegistration = {
       username,
@@ -19,35 +27,38 @@ export class AgentRegistration {
       password,
       first_name,
       last_name,
-        // terms_accepted
     };
 
     const verification_token = generateToken();
     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const agency = await AgencyQueries.findByPublicCode(public_code);
+    const agency = await this.agencyRepo.findByPublicCode(public_code);
     if (!agency) throw new Error('Invalid agency code.');
 
-    const userId = await UserInserts.create({
+    const userId = await this.userRepo.create({
       ...baseData,
       role: 'agent',
-      
       status: 'inactive',
       verification_token,
-      verification_token_expires
+      verification_token_expires,
     });
 
-    await RegistrationRequestRepository.create({
+    await this.requestRepo.create({
       user_id: userId,
       id_card_number,
-      status: "pending",
+      status: 'pending',
       agency_name: agency.agency_name,
       agency_id: agency.id,
       requested_role,
-        request_type: 'agent_license_verification'
+      request_type: 'agent_license_verification',
     });
 
-    await EmailService.sendVerificationEmail(email, `${first_name} ${last_name}`, verification_token);
+    const verificationEmail = new VerificationEmail(email, `${first_name} ${last_name}`, verification_token);
+    const emailSent = await verificationEmail.send();
+    if (!emailSent) {
+      throw new Error('Failed to send verification email');
+    }
+
     return userId;
   }
 }
