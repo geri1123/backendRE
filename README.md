@@ -63,5 +63,23 @@ JWT_SECRET=your_jwt_secret_key
 # Express server port
 PORT=8080
 
+
+
 # Node environment (can be development, production, or test)
 NODE_ENV=development
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+
+# Install dependencies
+npm install
+
+# Create your .env file
+cp .env.example .env
+
+# Build the project (for production or when using TypeScript)
+npm run build
+
+# Run the app
+npm run start
+# OR in development mode
+npm run dev
