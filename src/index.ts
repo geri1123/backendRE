@@ -20,7 +20,7 @@ app.use(cookieParser());
 
 
 
-// Split CORS origins and filter out empty strings
+// Split CORS
 const corsOrigins = config.server.corsOrigin
   .split(',')
   .map(origin => origin.trim())
@@ -30,7 +30,7 @@ console.log('🌐 Allowed CORS origins:', corsOrigins);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
+       
         if (!origin || corsOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -77,8 +77,3 @@ app.listen(config.server.port, () => {
     console.log(`📡 Health check: http://localhost:${config.server.port}/health`);
 });
 app.use(errorHandler as ErrorRequestHandler);
-// import { detectLanguage } from "./middlewares/languagemiddleware.js";
-// app.use(detectLanguage);
-// app.get("/example", (req, res) => {
-//   res.send(`Language is ${req.lang}`);
-// });

@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { comparePassword } from '../../utils/hash.js';
 import { config } from '../../config/config.js';
 import type { IUserRepository } from '../../repositories/user/IUserRepository.js';
-import type { IAgencyRepository } from '../../repositories/agency/IAgencyRepository.js';
+import { IAgencyRepository } from '../../repositories/agency/IAgencyRepository.js';
 import type { IRegistrationRequestRepository } from '../../repositories/registrationRequest/IRegistrationRequestRepository.js';
 
 export class AuthService {

@@ -1,4 +1,4 @@
-import { PrismaClient, RequestType, RequestStatus, RequestedRole } from '@prisma/client';
+import { RequestStatus } from '@prisma/client';
 
 import { NewRegistrationRequest } from '../../types/database.js';
 
