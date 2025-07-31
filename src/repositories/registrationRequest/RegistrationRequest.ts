@@ -84,6 +84,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   ]);
 
   const formattedData: AgentRequestQueryResult[] = registrationRequests.map((request) => ({
+    id: request.id,
     requestType: request.request_type,
     idCardNumber: request.id_card_number,
     status: request.status,

@@ -2,9 +2,12 @@ import path from 'path';
 import fs from 'fs/promises';
 import type { IUserRepository } from '../../repositories/user/IUserRepository.js';
 import { FileSystemError, NotFoundError } from '../../errors/BaseError.js';
+import { BaseUserService } from './BaseUserService.js';
+export class ProfileImageService extends BaseUserService {
+ constructor(userRepo: IUserRepository) {
+    super(userRepo);
+  }
 
-export class ProfileImageService {
-  constructor(private userRepo: IUserRepository) {}
 
   async updateProfileImage(
     userId: number,
@@ -23,7 +26,7 @@ export class ProfileImageService {
         if (err.code !== 'ENOENT') {
           throw new FileSystemError('Failed to delete old profile image');
         }
-        // Ignore missing file (ENOENT)
+     
       }
     }
 

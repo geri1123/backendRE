@@ -5,12 +5,12 @@ import { AgentsRequestsService } from "../../services/AgencyService/AgentsReques
 import { RespondRequestBody } from "../../types/AgentsRequest.js";
 import { AgentsRepository } from "../../repositories/agents/AgentRepository.js";
 import { RegistrationRequestRepository } from "../../repositories/registrationRequest/RegistrationRequest.js";
-
-// Initialize repositories
+import { respondToRequestSchema } from "../../validators/agentsRequests/respondeToRequest.js";
+import { handleZodError } from "../../validators/zodErrorFormated.js";
 const registrationRequestRepo = new RegistrationRequestRepository();
 const agentRepo = new AgentsRepository();
 
-// Initialize service with dependencies
+
 const agentsRequestsService = new AgentsRequestsService(registrationRequestRepo, agentRepo);
 
 export class AgentRequestController {
@@ -45,7 +45,9 @@ export class AgentRequestController {
       const reviewerId = req.userId;
       if (!reviewerId) throw new UnauthorizedError("User not authenticated");
 
-      const { requestId, status, reviewNotes, commissionRate } = req.body;
+       const parsed = respondToRequestSchema.parse(req.body);
+
+    const { requestId, status, reviewNotes, commissionRate } = parsed;
       
       await agentsRequestsService.respondToRequest(
         requestId, 
@@ -57,7 +59,7 @@ export class AgentRequestController {
 
       res.json({ message: `Request ${status} successfully` });
     } catch (err) {
-      next(err);
+     handleZodError(err, next);
     }
   }
 }

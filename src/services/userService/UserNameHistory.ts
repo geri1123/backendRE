@@ -1,15 +1,13 @@
 import { ValidationError, NotFoundError } from "../../errors/BaseError.js";
 import type { IUserRepository } from "../../repositories/user/IUserRepository.js";
 import type { IUsernameHistoryRepository } from "../../repositories/usernameHistory/IUsernameHistoryRepository.js";
-
-export class UsernameService {
-  private userRepo: IUserRepository;
-  private usernameHistoryRepo: IUsernameHistoryRepository;
-
-  constructor(userRepo: IUserRepository, usernameHistoryRepo: IUsernameHistoryRepository) {
-    this.userRepo = userRepo;
-    this.usernameHistoryRepo = usernameHistoryRepo;
-  }
+import { BaseUserService } from "./BaseUserService.js";
+export class UsernameService extends BaseUserService {
+  
+    constructor(userRepo: IUserRepository, private usernameHistoryRepo: IUsernameHistoryRepository) {
+      super(userRepo);
+    }
+ 
 
   async canUpdateUsername(userId: number): Promise<boolean> {
     const lastChange = await this.usernameHistoryRepo.getLastUsernameChange(userId);
