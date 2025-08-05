@@ -7,9 +7,9 @@ import { handleZodError } from "../../validators/zodErrorFormated.js";
 import { ChangeUsernameBody } from "../../validators/users/updateUsernameSchema.js";
 import { UsernameHistoryRepository } from "../../repositories/usernameHistory/UsernameHistoryRepository.js";
 import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma.js";
-
-const userRepo = new UserRepositoryPrisma();
-const usernameHistoryRepo = new UsernameHistoryRepository();
+import {prisma} from "../../config/prisma.js";
+const userRepo = new UserRepositoryPrisma(prisma);
+const usernameHistoryRepo = new UsernameHistoryRepository(prisma);
 const usernameService = new UsernameService(userRepo, usernameHistoryRepo);
 export async function changeUsername(
   req: Request<{}, {}, ChangeUsernameBody>,

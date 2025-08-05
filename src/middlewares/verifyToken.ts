@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config.js';
-
+import { prisma } from '../config/prisma.js';
 import { UserRepositoryPrisma } from '../repositories/user/UserRepositoryPrisma.js';
 import { AgencyRepository } from '../repositories/agency/AgencyRepository.js';
 interface DecodedToken extends jwt.JwtPayload {
@@ -19,8 +19,8 @@ declare global {
     }
   }
 }
-const UserUpdates = new UserRepositoryPrisma();
-const   AgencyQueries = new AgencyRepository();
+const UserUpdates = new UserRepositoryPrisma(prisma);
+const   AgencyQueries = new AgencyRepository(prisma);
 export const verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<void>=> {
   const authHeader = req.headers.authorization;
   const token =

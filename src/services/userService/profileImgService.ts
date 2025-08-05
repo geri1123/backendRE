@@ -1,13 +1,14 @@
+// ProfileImageService.ts
 import path from 'path';
 import fs from 'fs/promises';
 import type { IUserRepository } from '../../repositories/user/IUserRepository.js';
 import { FileSystemError, NotFoundError } from '../../errors/BaseError.js';
 import { BaseUserService } from './BaseUserService.js';
+
 export class ProfileImageService extends BaseUserService {
- constructor(userRepo: IUserRepository) {
+  constructor(userRepo: IUserRepository) {
     super(userRepo);
   }
-
 
   async updateProfileImage(
     userId: number,
@@ -22,15 +23,17 @@ export class ProfileImageService extends BaseUserService {
       const oldImagePath = path.resolve(baseDir, user.profile_img);
       try {
         await fs.unlink(oldImagePath);
+        console.log(`Old profile image deleted: ${oldImagePath}`);
       } catch (err: any) {
         if (err.code !== 'ENOENT') {
-          throw new FileSystemError('Failed to delete old profile image');
+          console.error(`Failed to delete old profile image: ${err.message}`);
+         
         }
-     
       }
     }
 
-    const newImagePath = `uploads/images/${file.filename}`;
+    // The file path should match the multer configuration for profile_images
+    const newImagePath = `uploads/images/profile_images/${file.filename}`;
     await this.userRepo.updateFieldsById(userId, { profile_img: newImagePath });
 
     return newImagePath;

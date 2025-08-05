@@ -79,7 +79,6 @@ cp .env.example .env
 # Build the project (for production or when using TypeScript)
 npm run build
 
-# Run the app
-npm run start
+
 # OR in development mode
 npm run dev

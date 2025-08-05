@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
 import { AgencyRepository } from '../../repositories/agency/AgencyRepository.js';
 import { EmailVerificationService } from '../../services/AuthServices/verifyEmailService.js';
-const userRepo = new UserRepositoryPrisma();
-const agencyRepo = new AgencyRepository();
+import  {prisma} from '../../config/prisma.js';
+const userRepo = new UserRepositoryPrisma(prisma);
+const agencyRepo = new AgencyRepository(prisma);
 const emailVerificationService = new EmailVerificationService(userRepo, agencyRepo);
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {

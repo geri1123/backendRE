@@ -2,11 +2,11 @@ import { z, RefinementCtx } from "zod";
 import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma.js";
 import { AgencyRepository } from "../../repositories/agency/AgencyRepository.js";
 import { RegistrationRequestRepository } from "../../repositories/registrationRequest/RegistrationRequest.js";
-
+import { prisma } from "../../config/prisma.js";
 // Initialize repository instances
-const userRepo = new UserRepositoryPrisma();
-const agencyRepo = new AgencyRepository();
-const registrationRequestRepo = new RegistrationRequestRepository();
+const userRepo = new UserRepositoryPrisma(prisma);
+const agencyRepo = new AgencyRepository(prisma);
+const registrationRequestRepo = new RegistrationRequestRepository(prisma);
 
 export const registrationSchema = z
   .object({

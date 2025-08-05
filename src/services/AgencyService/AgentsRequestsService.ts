@@ -4,10 +4,12 @@ import { IRegistrationRequestRepository } from "../../repositories/registrationR
 import { IAgentsRepository } from "../../repositories/agents/IAgentsRepository.js";
 import { AgentWellcomeEmail } from "../emailServices/verificationEmailservice.js";
 import { RejectionEmail } from "../emailServices/verificationEmailservice.js";
+import { IUserRepository } from "../../repositories/user/IUserRepository.js";
 export class AgentsRequestsService {
   constructor(
     private readonly registrationRequestRepo: IRegistrationRequestRepository,
-    private readonly agentRepo: IAgentsRepository
+    private readonly agentRepo: IAgentsRepository,
+    private readonly userRepo: IUserRepository
   ) {}
 
   private async getRequestsByAgencyId(
@@ -120,7 +122,10 @@ export class AgentsRequestsService {
           start_date: new Date(),
           end_date: null,
         });
-
+   await this.userRepo.updateFieldsById(fullRequest.user.id, {
+      role: "agent",
+      status: "active",
+    });
        const welcomeEmail = new AgentWellcomeEmail(fullRequest.user.email, fullRequest.user.first_name || "Agent");
 await welcomeEmail.send();
       } catch (error) {

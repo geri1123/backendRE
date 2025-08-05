@@ -1,10 +1,11 @@
-import { prisma } from '../../config/prisma.js';
+// import { prisma } from '../../config/prisma.js';
 import type { UsernameHistoryRecord } from '../../types/database.js';
 import { IUsernameHistoryRepository } from './IUsernameHistoryRepository.js';
-
+import { PrismaClient } from '@prisma/client';
 export class UsernameHistoryRepository implements IUsernameHistoryRepository {
+  constructor(private prisma: PrismaClient) {}
   async getLastUsernameChange(userId: number): Promise<UsernameHistoryRecord | null> {
-    const record = await prisma.usernameHistory.findFirst({
+    const record = await this.prisma.usernamehistory.findFirst({
       where: { user_id: userId },
       orderBy: { next_username_update: 'desc' },
     });
@@ -17,7 +18,7 @@ export class UsernameHistoryRepository implements IUsernameHistoryRepository {
     newUsername: string,
     nextUpdateDate: Date
   ): Promise<void> {
-    await prisma.usernameHistory.create({
+    await this.prisma.usernamehistory.create({
       data: {
         user_id: userId,
         old_username: oldUsername,

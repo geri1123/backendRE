@@ -4,8 +4,8 @@ import { handleZodError } from '../../validators/zodErrorFormated.js';
 import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPrisma.js';
 import { ProfileInfoService } from '../../services/userService/profileInfoService.js';
 import { updateProfileSchema } from '../../validators/users/updateProfileSchema.js';
-
-const userRepo = new UserRepositoryPrisma();
+import { prisma } from '../../config/prisma.js';
+const userRepo = new UserRepositoryPrisma(prisma);
 const profileInfoService = new ProfileInfoService(userRepo);
 export async function updateProfileFields(
   req: Request,
@@ -20,14 +20,15 @@ export async function updateProfileFields(
 
     const messages: string[] = [];
 
-    if (data.firstName !== undefined || data.lastName !== undefined) {
-      await profileInfoService.updateFirstNlastN(
-        userId,
-        data.firstName ?? '',
-        data.lastName ?? ''
-      );
-      messages.push('Name updated successfully');
+    if (data.firstName !== undefined) {
+      await profileInfoService.updateFirstNlastN(userId,data.firstName);
+     
+      messages.push('First Name updated successfully');
     }
+     if (data.lastName !== undefined) {
+        await profileInfoService.updateLName(userId, data.lastName);
+        messages.push('Last name updated successfully');
+      }
 
     if (data.aboutMe !== undefined) {
       await profileInfoService.updateAboutMe(userId, data.aboutMe);

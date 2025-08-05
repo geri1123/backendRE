@@ -14,7 +14,10 @@ export class ProfileInfoService extends BaseUserService{
     await this.userRepo.updateFieldsById(userId, { phone });
   }
 
-  async updateFirstNlastN(userId: number, first_name: string, last_name: string): Promise<void> {
-    await this.userRepo.updateFieldsById(userId, { first_name, last_name });
+  async updateFirstNlastN(userId: number, first_name: string): Promise<void> {
+    await this.userRepo.updateFieldsById(userId, { first_name });
+  }
+  async updateLName(userId:number , last_name: string): Promise<void> {
+    await this.userRepo.updateFieldsById(userId, { last_name });
   }
 }

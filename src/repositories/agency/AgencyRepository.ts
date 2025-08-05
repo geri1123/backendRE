@@ -1,33 +1,39 @@
 // backend/src/repositories/AgencyRepository.ts
-import { prisma } from '../../config/prisma.js';
+// import { prisma } from '../../config/prisma.js';
 import { generatePublicCode } from '../../utils/hash.js';
 import { AgencyModel, NewAgency, NewAgencyUnchecked } from '../../types/database.js';
-
+import { PrismaClient } from '@prisma/client';
 export class AgencyRepository {
+  constructor(private prisma : PrismaClient) {}
   async licenseExists(license: string): Promise<boolean> {
-    const agency = await prisma.agency.findFirst({
+    const agency = await this.prisma.agency.findFirst({
       where: { license_number: license },
       select: { id: true },
     });
     return agency !== null;
   }
-
+async findLogoById(agencyId: number): Promise<{ logo: string | null } | null> {
+  return this.prisma.agency.findUnique({
+    where: { id: agencyId },
+    select: { logo: true },
+  });
+}
   async findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null> {
-    const agency = await prisma.agency.findFirst({
+    const agency = await this.prisma.agency.findFirst({
       where: { owner_user_id: ownerUserId },
       select: { id: true },
     });
     return agency || null;
   }
-
+  
   async findByPublicCode(publicCode: string): Promise<AgencyModel | null> {
-    return prisma.agency.findUnique({
+    return this.prisma.agency.findUnique({
       where: { public_code: publicCode },
     });
   }
 
   async agencyNameExist(agencyName: string): Promise<boolean> {
-    const agency = await prisma.agency.findFirst({
+    const agency = await this.prisma.agency.findFirst({
       where: { agency_name: agencyName },
       select: { id: true },
     });
@@ -42,7 +48,7 @@ export class AgencyRepository {
       publicCode = generatePublicCode();
     } while (await this.publicCodeExists(publicCode));
 
-    const newAgency = await prisma.agency.create({
+    const newAgency = await this.prisma.agency.create({
       data: {
         ...agencyData,
         public_code: publicCode,
@@ -56,7 +62,7 @@ export class AgencyRepository {
   }
 
   private async publicCodeExists(publicCode: string): Promise<boolean> {
-    const existing = await prisma.agency.findUnique({
+    const existing = await this.prisma.agency.findUnique({
       where: { public_code: publicCode },
       select: { id: true },
     });
@@ -64,7 +70,7 @@ export class AgencyRepository {
   }
 
   async activateAgency(agencyId: number): Promise<void> {
-    await prisma.agency.update({
+    await this.prisma.agency.update({
       where: { id: agencyId },
       data: { status: 'active' },
     });
@@ -93,7 +99,7 @@ export class AgencyRepository {
 
     if (Object.keys(filteredData).length === 0) return;
 
-    await prisma.agency.update({
+    await this.prisma.agency.update({
       where: { id: agencyId },
       data: { ...filteredData },
     });

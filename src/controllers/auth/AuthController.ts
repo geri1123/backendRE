@@ -6,18 +6,20 @@ import { RegistrationRequestRepository } from '../../repositories/registrationRe
 
 import { LoginRequest } from "../../types/auth.js";
 import { RegistrationData } from '../../types/auth.js';
-import { ValidationError } from '../../errors/BaseError.js';
+
 import { loginValidation } from '../../validators/users/loginValidation.js';
 import { handleZodError } from '../../validators/zodErrorFormated.js';
 import { registrationSchema, RegistrationInput } from '../../validators/users/authValidatorAsync.js';
-
+import { prisma } from '../../config/prisma.js';
+import { NotificationRepository } from '../../repositories/notification/notificationRepository.js';
+import { NotificationService } from '../../services/Notifications/Notifications.js';
 // Initialize repositories
-const userRepo = new UserRepositoryPrisma();
-const agencyRepo = new AgencyRepository();
-const requestRepo = new RegistrationRequestRepository();
-
-// Initialize auth service with dependencies
-const authService = new AuthService(userRepo, agencyRepo, requestRepo);
+const userRepo = new UserRepositoryPrisma(prisma);
+const agencyRepo = new AgencyRepository(prisma);
+const requestRepo = new RegistrationRequestRepository(prisma);
+const notificationRepo = new NotificationRepository(prisma); 
+const notificationService = new NotificationService(notificationRepo);
+const authService = new AuthService(userRepo, agencyRepo, requestRepo , notificationService);
 
 // Register
 export async function register(

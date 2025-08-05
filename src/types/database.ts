@@ -1,16 +1,16 @@
 import type {
   Prisma,
-  User,
-  Agency,
-  RegistrationRequest,
-  UsernameHistory
+  user,
+  agency,
+  registrationrequest,
+  usernamehistory
 } from '@prisma/client';
 
 // Model types (from Prisma client)
-export type UserModel = User;
-export type NewUser = Prisma.UserCreateInput;
+export type UserModel = user;
+export type NewUser = Prisma.userCreateInput;
 export type UpdatableUserFields = Partial<Pick<
-  User,
+  user,
   | 'first_name'
   | 'last_name'
   | 'username'
@@ -21,20 +21,24 @@ export type UpdatableUserFields = Partial<Pick<
   | 'profile_img'
   | 'last_login'
   | 'last_active'
+  |'role'
+  | 'status'
 >>;
 
-export type AgencyModel = Agency;
-export type NewAgency = Prisma.AgencyCreateInput;
-export type NewAgencyUnchecked = Prisma.AgencyUncheckedCreateInput;
-export type RegistrationRequestModel = RegistrationRequest;
-export type NewRegistrationRequest = Prisma.RegistrationRequestCreateInput;
+export type AgencyModel = agency;
+export type NewAgency = Prisma.agencyCreateInput;
+export type NewAgencyUnchecked = Prisma.agencyUncheckedCreateInput;
 
-export type UsernameHistoryRecord = UsernameHistory;
-export type NewUsernameHistoryRecord = Prisma.UsernameHistoryCreateInput;
+
+export type RegistrationRequestModel = registrationrequest;
+export type NewRegistrationRequest = Prisma.registrationrequestCreateInput;
+
+export type UsernameHistoryRecord = usernamehistory;
+export type NewUsernameHistoryRecord = Prisma.usernamehistoryCreateInput;
 
 // Partial views
-export type PartialUserForLogin = Pick<User, 'id' | 'username' | 'email' | 'password' | 'status' | 'role'>;
-export type PartialUserByToken = Pick<User, 'id' | 'role' | 'email' | 'first_name'>;
+export type PartialUserForLogin = Pick<user, 'id' | 'username' | 'email' | 'password' | 'status' | 'role'>;
+export type PartialUserByToken = Pick<user, 'id' | 'role' | 'email' | 'first_name'>;
 
 // No need for tinyint <-> boolean conversions in Prisma,
 // because Prisma treats booleans as native booleans in TypeScript.

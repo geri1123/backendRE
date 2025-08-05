@@ -4,6 +4,7 @@ export interface IAgencyRepository {
   licenseExists(license: string): Promise<boolean>;
   findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null>;
   findByPublicCode(publicCode: string): Promise<AgencyModel | null>;
+  findLogoById(agencyId: number): Promise<{ logo: string | null } | null>;
   agencyNameExist(agencyName: string): Promise<boolean>;
   create(agencyData: Omit<NewAgencyUnchecked, 'id' | 'public_code' | 'status'>): Promise<number>;
   activateAgency(agencyId: number): Promise<void>;

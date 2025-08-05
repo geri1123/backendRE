@@ -7,11 +7,13 @@ import { AgentsRepository } from "../../repositories/agents/AgentRepository.js";
 import { RegistrationRequestRepository } from "../../repositories/registrationRequest/RegistrationRequest.js";
 import { respondToRequestSchema } from "../../validators/agentsRequests/respondeToRequest.js";
 import { handleZodError } from "../../validators/zodErrorFormated.js";
-const registrationRequestRepo = new RegistrationRequestRepository();
-const agentRepo = new AgentsRepository();
+import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma.js";
+import { prisma } from "../../config/prisma.js";
+const registrationRequestRepo = new RegistrationRequestRepository(prisma);
+const agentRepo = new AgentsRepository(prisma);
+const userRepo = new UserRepositoryPrisma(prisma);
 
-
-const agentsRequestsService = new AgentsRequestsService(registrationRequestRepo, agentRepo);
+const agentsRequestsService = new AgentsRequestsService(registrationRequestRepo, agentRepo , userRepo);
 
 export class AgentRequestController {
   static async getRequests(req: Request, res: Response, next: NextFunction) {

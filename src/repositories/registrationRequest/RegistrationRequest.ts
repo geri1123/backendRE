@@ -1,8 +1,8 @@
-import { RequestStatus } from '@prisma/client';
+import { registrationrequest_status } from '@prisma/client';
 
 import { NewRegistrationRequest } from '../../types/database.js';
-
-import { prisma } from '../../config/prisma.js';
+import { PrismaClient } from '@prisma/client';
+// import { prisma } from '../../config/prisma.js';
 import { AgentRequestQueryResult } from '../../types/AgentsRequest.js';
 
 import { IRegistrationRequestRepository } from './IRegistrationRequestRepository.js';
@@ -11,13 +11,13 @@ import { IRegistrationRequestRepository } from './IRegistrationRequestRepository
 
 
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
- 
+ constructor(private prisma: PrismaClient) {}
    async create(data:
      Omit<NewRegistrationRequest,'id' | 'created_at' | 'updated_at' | 'user' | 'agency' | 'reviewer'> & {
   user_id: number;
   agency_id?: number;
 }): Promise<number> {
-    const result = await prisma.registrationRequest.create({
+    const result = await this.prisma.registrationrequest.create({
       data: {
         user_id: data.user_id,
         request_type: data.request_type,
@@ -34,7 +34,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     return result.id;
   }
    async idCardExists(idCard: string): Promise<boolean> {
-    const result = await prisma.registrationRequest.findFirst({
+    const result = await this.prisma.registrationrequest.findFirst({
       where: {
         id_card_number: idCard,
       },
@@ -43,72 +43,72 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
     return result !== null;
   }
+//findagentRequestsByAgencyId
+ async findAgentRequestsByAgencyId(
+    agencyId: number,
+    limit: number,
+    offset: number
+  ): Promise<{ data: AgentRequestQueryResult[]; total: number }> {
 
-   async findAgentRequestsByAgencyId(
-  agencyId: number,
-  limit: number,
-  offset: number
-): Promise<{ data: AgentRequestQueryResult[]; total: number }> {
+    const whereCondition = {
+      agency_id: agencyId,
+      user: {
+        email_verified: true,
+      },
+    };
 
-  const whereCondition = {
-    agency_id: agencyId,
-    user: {
-      email_verified: true,
-    },
-  };
-
-  const [registrationRequests, totalCount] = await Promise.all([
-    prisma.registrationRequest.findMany({
-      where: whereCondition,
-      include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-            email_verified: true,
+    const [registrationRequests, totalCount] = await Promise.all([
+      this.prisma.registrationrequest.findMany({
+        where: whereCondition,
+        include: {
+          user: {
+            select: {
+              username: true,
+              email: true,
+              first_name: true,
+              last_name: true,
+              email_verified: true,
+            },
           },
         },
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    }),
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip: offset,
+      }),
+      
+      this.prisma.registrationrequest.count({
+        where: whereCondition,
+      }),
+    ]);
 
-    prisma.registrationRequest.count({
-      where: whereCondition,
-    }),
-  ]);
+    const formattedData: AgentRequestQueryResult[] = registrationRequests.map((request) => ({
+      id: request.id,
+      requestType: request.request_type,
+      idCardNumber: request.id_card_number,
+      status: request.status,
+      username: request.user.username,
+      email: request.user.email,
+      firstName: request.user.first_name,
+      lastName: request.user.last_name,
+      emailVerified: request.user.email_verified,
+      createdAt: request.created_at,
+    }));
 
-  const formattedData: AgentRequestQueryResult[] = registrationRequests.map((request) => ({
-    id: request.id,
-    requestType: request.request_type,
-    idCardNumber: request.id_card_number,
-    status: request.status,
-    username: request.user.username,
-    email: request.user.email,
-    firstName: request.user.first_name,
-    lastName: request.user.last_name,
-    emailVerified: request.user.email_verified,
-    createdAt: request.created_at,
-  }));
-
-  return {
-    data: formattedData,
-    total: totalCount,
-  };
-}
+    return {
+      data: formattedData,
+      total: totalCount,
+    };
+  }
  
    async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
-    return await prisma.registrationRequest.count({
+    return await this.prisma.registrationrequest.count({
       where: {
         // request_type: 'agent_license_verification',
         user: {
           email_verified: true,
-          agencyAgents: {
+           agencyMemberships: {
             some: {
               agency_id: agencyId,
             },
@@ -122,11 +122,11 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
    async updateStatus(
     id: number,
-    status: RequestStatus,
+    status: registrationrequest_status,
     reviewedBy?: number,
     reviewNotes?: string
   ) {
-    return await prisma.registrationRequest.update({
+    return await this.prisma.registrationrequest.update({
       where: { id },
       data: {
         status,
@@ -141,7 +141,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
    * Get all pending registration requests
    */
    async findPendingRequests(limit?: number) {
-    return await prisma.registrationRequest.findMany({
+    return await this.prisma.registrationrequest.findMany({
       where: {
         status: 'pending',
       },
@@ -162,9 +162,9 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     });
   }
 
-  
+  //find byUserId
    async findByUserId(userId: number) {
-    return await prisma.registrationRequest.findMany({
+    return await this.prisma.registrationrequest.findMany({
       where: {
         user_id: userId,
       },
@@ -173,9 +173,9 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       },
     });
   }
-
+//findById
     async findById(id: number) {
-    return await prisma.registrationRequest.findUnique({
+    return await this.prisma.registrationrequest.findUnique({
       where: { id },
       include: {
         user: {

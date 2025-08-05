@@ -1,9 +1,14 @@
-import { prisma } from "../../config/prisma.js";
+// import { prisma } from "../../config/prisma.js";
 import type { NewAgencyAgent } from "../../types/AgencyAgents.js";
+import { PrismaClient } from "@prisma/client";
 import { IAgentsRepository } from "./IAgentsRepository.js";
 export class AgentsRepository implements IAgentsRepository {
+  constructor(private prisma: PrismaClient) {}
+  
+  
   async create(agentData: NewAgencyAgent) {
-    return await prisma.agencyAgent.create({
+    
+    return await this.prisma.agencyagent.create({
       data: {
         agent_id: agentData.userId,
         agency_id: agentData.agency_id,
