@@ -12,6 +12,7 @@ import errorHandler from './middlewares/errorHandler.js';
 import agencyRouter from './routes/agencyRouter.js';
 import updateProfile from './routes/userRoutes.js';
 import authRouter from './routes/authRoutes.js';
+import notificationRouter from './routes/notificationRouter.js';
 import { setupSocket } from './socket/socket.js';
 
 dotenv.config();
@@ -51,7 +52,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRouter);
 app.use('/profile', updateProfile);
 app.use('/agencyapi', agencyRouter);
-
+app.use('/api/notification', notificationRouter);
 // Health check endpoints
 app.get('/', (req: Request, res: Response) => {
   res.json({

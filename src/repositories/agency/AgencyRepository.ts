@@ -18,6 +18,16 @@ async findLogoById(agencyId: number): Promise<{ logo: string | null } | null> {
     select: { logo: true },
   });
 }
+async findWithOwnerById(agencyId: number): Promise<{ id: number; agency_name: string; owner_user_id: number } | null> {
+  return this.prisma.agency.findUnique({
+    where: { id: agencyId },
+    select: {
+      id: true,
+      agency_name: true,
+      owner_user_id: true,
+    },
+  });
+}
   async findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null> {
     const agency = await this.prisma.agency.findFirst({
       where: { owner_user_id: ownerUserId },

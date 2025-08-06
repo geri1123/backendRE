@@ -68,7 +68,11 @@ export class UserRepositoryPrisma implements IUserRepository{
         id: true,
         role: true,
         email: true,
+        username: true,
+
         first_name: true,
+        last_name: true,
+        
       },
     });
 

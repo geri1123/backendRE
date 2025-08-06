@@ -36,4 +36,31 @@ export class NotificationRepository implements INotificationRepository {
       },
     });
   }
+ async getNotifications({
+  userId,
+  limit,
+  offset,
+  languageCode = 'en',
+}: {
+  userId: number;
+  limit?: number;
+  offset?: number;
+  languageCode?: string;
+}) {
+  return this.prisma.notification.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    skip: offset,
+    take: limit,
+    include: {
+      translations: {
+        where: { languageCode },
+        select: {
+          languageCode: true,
+          message: true,
+        },
+      },
+    },
+  });
+}
 }

@@ -9,6 +9,7 @@ import { respondToRequestSchema } from "../../validators/agentsRequests/responde
 import { handleZodError } from "../../validators/zodErrorFormated.js";
 import { UserRepositoryPrisma } from "../../repositories/user/UserRepositoryPrisma.js";
 import { prisma } from "../../config/prisma.js";
+
 const registrationRequestRepo = new RegistrationRequestRepository(prisma);
 const agentRepo = new AgentsRepository(prisma);
 const userRepo = new UserRepositoryPrisma(prisma);

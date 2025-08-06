@@ -17,9 +17,9 @@ import { NotificationService } from '../../services/Notifications/Notifications.
 const userRepo = new UserRepositoryPrisma(prisma);
 const agencyRepo = new AgencyRepository(prisma);
 const requestRepo = new RegistrationRequestRepository(prisma);
-const notificationRepo = new NotificationRepository(prisma); 
-const notificationService = new NotificationService(notificationRepo);
-const authService = new AuthService(userRepo, agencyRepo, requestRepo , notificationService);
+// const notificationRepo = new NotificationRepository(prisma); 
+// const notificationService = new NotificationService(notificationRepo);
+const authService = new AuthService(userRepo, agencyRepo, requestRepo );
 
 // Register
 export async function register(

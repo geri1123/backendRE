@@ -9,13 +9,13 @@ import { config } from '../../config/config.js';
 import type { IUserRepository } from '../../repositories/user/IUserRepository.js';
 import { IAgencyRepository } from '../../repositories/agency/IAgencyRepository.js';
 import type { IRegistrationRequestRepository } from '../../repositories/registrationRequest/IRegistrationRequestRepository.js';
-import { NotificationService } from '../Notifications/Notifications.js';
+// import { NotificationService } from '../Notifications/Notifications.js';
 export class AuthService {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly agencyRepo: IAgencyRepository,
     private readonly requestRepo: IRegistrationRequestRepository,
-      private readonly notificationService: NotificationService 
+      // private readonly notificationService: NotificationService 
   ) {}
 
   async registerUserByRole(body: RegistrationData): Promise<number> {
@@ -27,7 +27,7 @@ export class AuthService {
       case 'agency_owner':
         return new AgencyOwnerRegistration(this.userRepo, this.agencyRepo).register(body);
       case 'agent':
-        return new AgentRegistration(this.userRepo,this.agencyRepo  ,this.requestRepo , this.notificationService ).register(body);
+        return new AgentRegistration(this.userRepo,this.agencyRepo  ,this.requestRepo ).register(body);
       default:
         throw new Error('Invalid role.');
     }

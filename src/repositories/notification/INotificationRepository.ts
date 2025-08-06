@@ -14,4 +14,10 @@ export interface NotificationData {
 export interface INotificationRepository {
   createNotification(data: NotificationData): Promise<any>;
   countUnread(userId: number): Promise<number>;
+  getNotifications(params: {
+    userId: number;
+    limit?: number;
+    offset?: number;
+    languageCode?: string;
+  }): Promise<any[]>;
 }

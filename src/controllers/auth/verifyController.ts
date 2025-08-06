@@ -3,9 +3,15 @@ import { UserRepositoryPrisma } from '../../repositories/user/UserRepositoryPris
 import { AgencyRepository } from '../../repositories/agency/AgencyRepository.js';
 import { EmailVerificationService } from '../../services/AuthServices/verifyEmailService.js';
 import  {prisma} from '../../config/prisma.js';
+import { NotificationRepository } from '../../repositories/notification/notificationRepository.js';
+import { RegistrationRequestRepository } from '../../repositories/registrationRequest/RegistrationRequest.js';
+import { NotificationService } from '../../services/Notifications/Notifications.js';
 const userRepo = new UserRepositoryPrisma(prisma);
 const agencyRepo = new AgencyRepository(prisma);
-const emailVerificationService = new EmailVerificationService(userRepo, agencyRepo);
+const notificationRepo = new NotificationRepository(prisma);
+const registrationRequestRepo = new RegistrationRequestRepository(prisma);
+const notificationService = new NotificationService(notificationRepo);
+const emailVerificationService = new EmailVerificationService(userRepo, agencyRepo ,registrationRequestRepo, notificationService);
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {
   try {
