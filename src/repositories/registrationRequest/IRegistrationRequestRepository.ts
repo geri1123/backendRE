@@ -1,4 +1,4 @@
-import { registrationrequest_status } from '@prisma/client';
+import { RegistrationRequest_status } from '@prisma/client';
 import { NewRegistrationRequest } from '../../types/database.js';
 import { AgentRequestQueryResult } from '../../types/AgentsRequest.js';
 
@@ -20,7 +20,7 @@ export interface IRegistrationRequestRepository {
 
   updateStatus(
     id: number,
-    status: registrationrequest_status,
+    status: RegistrationRequest_status,
     reviewedBy?: number,
     reviewNotes?: string
   ): Promise<any>;

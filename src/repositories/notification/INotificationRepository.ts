@@ -1,4 +1,4 @@
-import { notification_status } from "@prisma/client";
+import { Notification_status } from "@prisma/client";
 
 export interface NotificationTranslationInput {
   languageCode: string;
@@ -20,4 +20,5 @@ export interface INotificationRepository {
     offset?: number;
     languageCode?: string;
   }): Promise<any[]>;
+  changeNotificationStatus(notificationId: number, status: Notification_status): Promise<any>;
 }

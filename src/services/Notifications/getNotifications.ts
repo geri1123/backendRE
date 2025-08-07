@@ -14,8 +14,7 @@ export class GetNotificationService {
       this.notificationRepo.countUnread(userId),
     ]);
 
-    // If the languageCode is not English and some translations are missing,
-    // fetch fallback English translations
+    
     if (languageCode !== 'en') {
       const missingTranslationIds = notifications
         .filter((n) => n.translations.length === 0)
@@ -40,5 +39,8 @@ export class GetNotificationService {
     }
 
     return { notifications, unreadCount };
+  }
+  async markAsRead(notificationId: number): Promise<void> {
+    this.notificationRepo.changeNotificationStatus(notificationId , 'read');
   }
 }

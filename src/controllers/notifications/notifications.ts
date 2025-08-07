@@ -29,3 +29,19 @@ export async function getNotifications(req: Request, res: Response, next: NextFu
     return next(error);
   }
 }
+
+export async function markNotificationAsRead(req: Request, res: Response, next: NextFunction) {
+  const userId = req.userId;
+  const notificationId = parseInt(req.params.id);
+
+  if (!userId) {
+    throw new UnauthorizedError("User not authenticated");
+  }
+
+  try {
+    await getNotificationService.markAsRead(notificationId);
+    res.status(200).json({ success: true, message: "Notification marked as read" });
+  } catch (error) {
+    return next(error);
+  }
+}

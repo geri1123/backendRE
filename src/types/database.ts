@@ -1,16 +1,16 @@
 import type {
   Prisma,
-  user,
-  agency,
-  registrationrequest,
-  usernamehistory
+  User,
+  Agency,
+  RegistrationRequest,
+  UsernameHistory
 } from '@prisma/client';
 
 // Model types (from Prisma client)
-export type UserModel = user;
-export type NewUser = Prisma.userCreateInput;
+export type UserModel = User;
+export type NewUser = Prisma.UserCreateInput;
 export type UpdatableUserFields = Partial<Pick<
-  user,
+  User,
   | 'first_name'
   | 'last_name'
   | 'username'
@@ -25,20 +25,20 @@ export type UpdatableUserFields = Partial<Pick<
   | 'status'
 >>;
 
-export type AgencyModel = agency;
-export type NewAgency = Prisma.agencyCreateInput;
-export type NewAgencyUnchecked = Prisma.agencyUncheckedCreateInput;
+export type AgencyModel = Agency;
+export type NewAgency = Prisma.AgencyCreateInput;
+export type NewAgencyUnchecked = Prisma.AgencyUncheckedCreateInput;
 
 
-export type RegistrationRequestModel = registrationrequest;
-export type NewRegistrationRequest = Prisma.registrationrequestCreateInput;
+export type RegistrationRequestModel = RegistrationRequest;
+export type NewRegistrationRequest = Prisma.RegistrationRequestCreateInput;
 
-export type UsernameHistoryRecord = usernamehistory;
-export type NewUsernameHistoryRecord = Prisma.usernamehistoryCreateInput;
+export type UsernameHistoryRecord = UsernameHistory;
+export type NewUsernameHistoryRecord = Prisma.UsernameHistoryCreateInput;
 
 // Partial views
-export type PartialUserForLogin = Pick<user, 'id' | 'username' | 'email' | 'password' | 'status' | 'role'>;
-export type PartialUserByToken = Pick<user, 'id' | 'role' | 'email' | 'first_name'| 'username'>;
+export type PartialUserForLogin = Pick<User, 'id' | 'username' | 'email' | 'password' | 'status' | 'role'>;
+export type PartialUserByToken = Pick<User, 'id' | 'role' | 'email' | 'first_name'| 'username'>;
 
 // No need for tinyint <-> boolean conversions in Prisma,
 // because Prisma treats booleans as native booleans in TypeScript.

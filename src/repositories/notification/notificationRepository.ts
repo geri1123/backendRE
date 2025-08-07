@@ -1,6 +1,6 @@
 // repositories/notification/NotificationRepository.ts
 
-import { PrismaClient, notification_status } from "@prisma/client";
+import { PrismaClient, Notification_status } from "@prisma/client";
 import {
   INotificationRepository,
   NotificationData,
@@ -14,7 +14,7 @@ export class NotificationRepository implements INotificationRepository {
       data: {
         userId,
         type,
-        status: notification_status.unread,
+        status: Notification_status.unread,
         translations: {
           create: translations.map((t) => ({
             languageCode: t.languageCode,
@@ -32,7 +32,7 @@ export class NotificationRepository implements INotificationRepository {
     return this.prisma.notification.count({
       where: {
         userId,
-        status: notification_status.unread,
+        status: Notification_status.unread,
       },
     });
   }
@@ -62,5 +62,11 @@ export class NotificationRepository implements INotificationRepository {
       },
     },
   });
-}
+};
+async changeNotificationStatus(notificationId: number, status: Notification_status) {
+    return this.prisma.notification.update({
+      where: { id: notificationId },
+      data: { status },
+    });
+  }
 }

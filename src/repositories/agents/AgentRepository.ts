@@ -8,7 +8,7 @@ export class AgentsRepository implements IAgentsRepository {
   
   async create(agentData: NewAgencyAgent) {
     
-    return await this.prisma.agencyagent.create({
+    return await this.prisma.agencyAgent.create({
       data: {
         agent_id: agentData.userId,
         agency_id: agentData.agency_id,

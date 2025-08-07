@@ -1,4 +1,4 @@
-import { registrationrequest_status } from '@prisma/client';
+import { RegistrationRequest_status } from '@prisma/client';
 
 import { NewRegistrationRequest } from '../../types/database.js';
 import { PrismaClient } from '@prisma/client';
@@ -17,7 +17,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   user_id: number;
   agency_id?: number;
 }): Promise<number> {
-    const result = await this.prisma.registrationrequest.create({
+    const result = await this.prisma.registrationRequest.create({
       data: {
         user_id: data.user_id,
         request_type: data.request_type,
@@ -34,7 +34,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     return result.id;
   }
    async idCardExists(idCard: string): Promise<boolean> {
-    const result = await this.prisma.registrationrequest.findFirst({
+    const result = await this.prisma.registrationRequest.findFirst({
       where: {
         id_card_number: idCard,
       },
@@ -58,7 +58,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     };
 
     const [registrationRequests, totalCount] = await Promise.all([
-      this.prisma.registrationrequest.findMany({
+      this.prisma.registrationRequest.findMany({
         where: whereCondition,
         include: {
           user: {
@@ -78,7 +78,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
         skip: offset,
       }),
       
-      this.prisma.registrationrequest.count({
+      this.prisma.registrationRequest.count({
         where: whereCondition,
       }),
     ]);
@@ -103,7 +103,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   }
  
    async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
-    return await this.prisma.registrationrequest.count({
+    return await this.prisma.registrationRequest.count({
       where: {
         // request_type: 'agent_license_verification',
         user: {
@@ -122,11 +122,11 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
    async updateStatus(
     id: number,
-    status: registrationrequest_status,
+    status: RegistrationRequest_status,
     reviewedBy?: number,
     reviewNotes?: string
   ) {
-    return await this.prisma.registrationrequest.update({
+    return await this.prisma.registrationRequest.update({
       where: { id },
       data: {
         status,
@@ -141,7 +141,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
    * Get all pending registration requests
    */
    async findPendingRequests(limit?: number) {
-    return await this.prisma.registrationrequest.findMany({
+    return await this.prisma.registrationRequest.findMany({
       where: {
         status: 'pending',
       },
@@ -164,7 +164,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
   //find byUserId
    async findByUserId(userId: number) {
-    return await this.prisma.registrationrequest.findMany({
+    return await this.prisma.registrationRequest.findMany({
       where: {
         user_id: userId,
       },
@@ -175,7 +175,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   }
 //findById
     async findById(id: number) {
-    return await this.prisma.registrationrequest.findUnique({
+    return await this.prisma.registrationRequest.findUnique({
       where: { id },
       include: {
         user: {
